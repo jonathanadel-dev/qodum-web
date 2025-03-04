@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IProfession extends Document {
+  session: string;
+  profession: string;
+}
 
-
-
-
-// Profession Schema
-const ProfessionSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        profession:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const ProfessionSchema = new mongoose.Schema<IProfession>(
+  {
+    session: { type: String, required: true },
+    profession: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Profession: Model<IProfession> =
+  (mongoose.models.Profession as Model<IProfession>) ||
+  mongoose.model<IProfession>("Profession", ProfessionSchema);
 
-
-
-
-// Export
-const Profession = mongoose.models.Profession || mongoose.model('Profession', ProfessionSchema);
 export default Profession;

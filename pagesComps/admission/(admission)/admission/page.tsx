@@ -415,20 +415,36 @@ const page = () => {
     }]);
 
 
-    // Use effects
     useEffect(() => {
         const fetcher = async () => {
-            const studentsRes = await fetchAllAdmittedStudents();
-            const registeredStudentsRes = await fetchManualListStudents();
-            setStudents(studentsRes);
-            setRegisteredStudents(registeredStudentsRes.filter((s:any) => !studentsRes.map((student) => student?.student?.name).includes(s?.student?.name)));
-            const designationsRes = await fetchDesignationsNames();
-            const professionsRes = await fetchProfessionsNames();
-            const staffRes = await fetchStaffNames();
-            setDesignations(designationsRes);
-            setProfessions(professionsRes);
-            setStaff(staffRes);
+            try {
+                const [
+                    studentsRes,
+                    registeredStudentsRes,
+                    designationsRes,
+                    professionsRes,
+                    staffRes
+                ] = await Promise.all([
+                    fetchAllAdmittedStudents(),
+                    fetchManualListStudents(),
+                    fetchDesignationsNames(),
+                    fetchProfessionsNames(),
+                    fetchStaffNames()
+                ]);
+                setStudents(studentsRes);
+                setRegisteredStudents(
+                    registeredStudentsRes.filter((s: any) => 
+                        !studentsRes.map((student) => student?.student?.name).includes(s?.student?.name)
+                    )
+                );
+                setDesignations(designationsRes);
+                setProfessions(professionsRes);
+                setStaff(staffRes);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         };
+    
         fetcher();
     }, [isViewOpened]);
 

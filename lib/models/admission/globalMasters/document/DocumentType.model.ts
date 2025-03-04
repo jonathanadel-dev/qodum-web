@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IDocumentType extends Document {
+  session: string;
+  document_type: string;
+}
 
-
-
-
-// Documnent type schema
-const DocumentTypeSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        document_type:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const DocumentTypeSchema = new mongoose.Schema<IDocumentType>(
+  {
+    session: { type: String, required: true },
+    document_type: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const DocumentType: Model<IDocumentType> =
+  (mongoose.models.DocumentType as Model<IDocumentType>) ||
+  mongoose.model<IDocumentType>("DocumentType", DocumentTypeSchema);
 
-
-
-
-// Export
-const DocumentType = mongoose.models.DocumentType || mongoose.model('DocumentType', DocumentTypeSchema);
 export default DocumentType;

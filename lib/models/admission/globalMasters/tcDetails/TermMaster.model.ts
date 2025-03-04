@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface ITerm extends Document {
+  session: string;
+  term_name: string;
+}
 
-
-
-
-// Term Master Schema
-const TermSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        term_name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const TermSchema = new mongoose.Schema<ITerm>(
+  {
+    session: { type: String, required: true },
+    term_name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const newTermMaster: Model<ITerm> =
+  (mongoose.models.newTermMaster as Model<ITerm>) ||
+  mongoose.model<ITerm>("Term", TermSchema);
 
-
-
-
-// Export
-const newTermMaster = mongoose.models.newTermMaster || mongoose.model('Term', TermSchema);
 export default newTermMaster;

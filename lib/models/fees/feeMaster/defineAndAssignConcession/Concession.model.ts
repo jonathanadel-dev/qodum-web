@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IConcession extends Document {
+  session: string;
+  name: string;
+}
 
-
-
-
-// Concession Schema
-const ConcessionSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const ConcessionSchema = new mongoose.Schema<IConcession>(
+  {
+    session: { type: String, required: true },
+    name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Concession: Model<IConcession> =
+  (mongoose.models.Concession as Model<IConcession>) ||
+  mongoose.model<IConcession>("Concession", ConcessionSchema);
 
-
-
-
-// Export
-const Concession = mongoose.models.Concession || mongoose.model('Concession', ConcessionSchema);
 export default Concession;

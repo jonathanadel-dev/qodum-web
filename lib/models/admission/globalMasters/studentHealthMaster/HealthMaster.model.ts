@@ -1,26 +1,22 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IHealthMaster extends Document {
+  session: string;
+  health_parameter: string;
+  unit: string;
+}
 
-
-
-
-// Health Master Schema
-const HealthMasterSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        health_parameter:{type:String, required:true},
-        unit:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const HealthMasterSchema = new mongoose.Schema<IHealthMaster>(
+  {
+    session: { type: String, required: true },
+    health_parameter: { type: String, required: true },
+    unit: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const HealthMaster: Model<IHealthMaster> =
+  (mongoose.models.HealthMaster as Model<IHealthMaster>) ||
+  mongoose.model<IHealthMaster>("HealthMaster", HealthMasterSchema);
 
-
-
-
-// Export
-const HealthMaster = mongoose.models.HealthMaster || mongoose.model('HealthMaster', HealthMasterSchema);
 export default HealthMaster;

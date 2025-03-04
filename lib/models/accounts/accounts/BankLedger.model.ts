@@ -1,36 +1,42 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IBankLedger extends Document {
+  session: string;
+  account_name: string;
+  account_no: number;
+  group: string;
+  account_type?: string;
+  account_address?: string;
+  account_city?: string;
+  pin_code?: number;
+  email?: string;
+  mobile?: number;
+  opening_balance: number;
+  opening_balance_type?: string;
+  assign_date?: Date;
+}
 
-
-
-
-// Bank Ledger Schema
-const BankLedgerSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        account_name:{type:String, required:true},
-        account_no:{type:Number, required:true},
-        group:{type:String, required:true},
-        account_type:{type:String},
-        account_address:{type:String},
-        account_city:{type:String},
-        pin_code:{type:Number},
-        email:{type:String},
-        mobile:{type:Number},
-        opening_balance:{type:Number, required:true},
-        opening_balance_type:{type:String},
-        assign_date:{type:Date},
-    },
-    {
-        timestamps:true
-    }
+const BankLedgerSchema = new mongoose.Schema<IBankLedger>(
+  {
+    session: { type: String, required: true },
+    account_name: { type: String, required: true },
+    account_no: { type: Number, required: true },
+    group: { type: String, required: true },
+    account_type: { type: String },
+    account_address: { type: String },
+    account_city: { type: String },
+    pin_code: { type: Number },
+    email: { type: String },
+    mobile: { type: Number },
+    opening_balance: { type: Number, required: true },
+    opening_balance_type: { type: String },
+    assign_date: { type: Date },
+  },
+  { timestamps: true }
 );
 
+const BankLedger: Model<IBankLedger> =
+  (mongoose.models.BankLedger as Model<IBankLedger>) ||
+  mongoose.model<IBankLedger>("BankLedger", BankLedgerSchema);
 
-
-
-
-// Export
-const BankLedger = mongoose.models.BankLedger || mongoose.model('BankLedger', BankLedgerSchema);
 export default BankLedger;

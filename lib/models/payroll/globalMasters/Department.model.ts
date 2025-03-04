@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IDepartment extends Document {
+  session: string;
+  department: string;
+}
 
-
-
-
-// Department Schema
-const DepartmentSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        department:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const DepartmentSchema = new mongoose.Schema<IDepartment>(
+  {
+    session: { type: String, required: true },
+    department: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Department: Model<IDepartment> =
+  (mongoose.models.Department as Model<IDepartment>) ||
+  mongoose.model<IDepartment>("Department", DepartmentSchema);
 
-
-
-
-// Export
-const Department = mongoose.models.Department || mongoose.model('Department', DepartmentSchema);
 export default Department;

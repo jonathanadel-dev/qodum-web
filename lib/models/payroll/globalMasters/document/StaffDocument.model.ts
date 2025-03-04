@@ -1,26 +1,22 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IStaffDocument extends Document {
+  session: string;
+  document_type: string;
+  document_name: string;
+}
 
-
-
-
-// Staff document schema
-const staffDocumentSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        document_type:{type:String, required:true},
-        document_name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const StaffDocumentSchema = new mongoose.Schema<IStaffDocument>(
+  {
+    session: { type: String, required: true },
+    document_type: { type: String, required: true },
+    document_name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const StaffDocument: Model<IStaffDocument> =
+  (mongoose.models.StaffDocument as Model<IStaffDocument>) ||
+  mongoose.model<IStaffDocument>("StaffDocument", StaffDocumentSchema);
 
-
-
-
-// Export
-const StaffDocument = mongoose.models.StaffDocument || mongoose.model('StaffDocument', staffDocumentSchema);
 export default StaffDocument;

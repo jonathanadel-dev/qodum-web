@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IVehicleType extends Document {
+  session: string;
+  vehicle_name: string;
+}
 
-
-
-
-// Vehicle Type Schema
-const VehicleTypeSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        vehicle_name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const VehicleTypeSchema = new mongoose.Schema<IVehicleType>(
+  {
+    session: { type: String, required: true },
+    vehicle_name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const VehicleType: Model<IVehicleType> =
+  (mongoose.models.VehicleType as Model<IVehicleType>) ||
+  mongoose.model<IVehicleType>("VehicleType", VehicleTypeSchema);
 
-
-
-
-// Export
-const VehicleType = mongoose.models.VehicleType || mongoose.model('VehicleType', VehicleTypeSchema);
 export default VehicleType;

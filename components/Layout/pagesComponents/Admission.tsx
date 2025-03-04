@@ -277,7 +277,6 @@ const Home = () => {
       };
     };
     asyncFunc();
-
   }, [openedPages]);
   useEffect(() => {
     if(page){
@@ -303,3 +302,4 @@ const Home = () => {
 
 // Export
 export default Home;
+

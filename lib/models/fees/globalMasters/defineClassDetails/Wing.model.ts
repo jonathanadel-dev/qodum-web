@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IWing extends Document {
+  session: string;
+  wing: string;
+}
 
-
-
-
-// Wing Schema
-const WingSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        wing:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const WingSchema = new mongoose.Schema<IWing>(
+  {
+    session: { type: String, required: true },
+    wing: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Wing: Model<IWing> =
+  (mongoose.models.Wing as Model<IWing>) ||
+  mongoose.model<IWing>("Wing", WingSchema);
 
-
-
-
-// Export
-const Wing = mongoose.models.Wing || mongoose.model('Wing', WingSchema);
 export default Wing;

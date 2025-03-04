@@ -1,27 +1,24 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IGroup extends Document {
+  session: string;
+  name: string;
+  is_special?: boolean;
+  affiliated_heads?: any[]; // Adjust this type if you have a more specific structure
+}
 
-
-
-
-// Group Schema
-const GroupSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        name:{type:String, required:true},
-        is_special:{type:Boolean},
-        affiliated_heads:{type:Array}
-    },
-    {
-        timestamps:true
-    }
+const GroupSchema = new mongoose.Schema<IGroup>(
+  {
+    session: { type: String, required: true },
+    name: { type: String, required: true },
+    is_special: { type: Boolean },
+    affiliated_heads: [{ type: mongoose.Schema.Types.Mixed }],
+  },
+  { timestamps: true }
 );
 
+const Group: Model<IGroup> =
+  (mongoose.models.Group as Model<IGroup>) ||
+  mongoose.model<IGroup>("Group", GroupSchema);
 
-
-
-
-// Export
-const Group = mongoose.models.Group || mongoose.model('Group', GroupSchema);
 export default Group;

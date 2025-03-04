@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IHouse extends Document {
+  session: string;
+  house_name: string;
+}
 
-
-
-
-// House Schema
-const HouseSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        house_name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const HouseSchema = new mongoose.Schema<IHouse>(
+  {
+    session: { type: String, required: true },
+    house_name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const House: Model<IHouse> =
+  (mongoose.models.House as Model<IHouse>) ||
+  mongoose.model<IHouse>("House", HouseSchema);
 
-
-
-
-// Export
-const House = mongoose.models.House || mongoose.model('House', HouseSchema);
 export default House;
