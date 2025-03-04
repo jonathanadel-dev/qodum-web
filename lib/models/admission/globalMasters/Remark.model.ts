@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IRemark extends Document {
+  session: string;
+  remark: string;
+}
 
-
-
-
-// Remark Schema
-const RemarkSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        remark:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const RemarkSchema = new mongoose.Schema<IRemark>(
+  {
+    session: { type: String, required: true },
+    remark: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Remark: Model<IRemark> =
+  (mongoose.models.Remark as Model<IRemark>) ||
+  mongoose.model<IRemark>("Remark", RemarkSchema);
 
-
-
-
-// Export
-const Remark = mongoose.models.Remark || mongoose.model('Remark', RemarkSchema);
 export default Remark;

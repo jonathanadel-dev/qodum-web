@@ -1,27 +1,29 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+// Define an interface for your Subject document
+export interface ISubject extends Document {
+  session: string;
+  subject_name: string;
+  available_seats?: number;
+  is_university?: boolean;
+}
 
-
-
-
-// Subject Schema
-const SubjectSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        subject_name:{type:String, required:true},
-        available_seats:{type:Number},
-        is_university:{type:Boolean}
-    },
-    {
-        timestamps:true
-    }
+// Define the schema using the interface as a generic
+const SubjectSchema = new mongoose.Schema<ISubject>(
+  {
+    session: { type: String, required: true },
+    subject_name: { type: String, required: true },
+    available_seats: { type: Number },
+    is_university: { type: Boolean },
+  },
+  {
+    timestamps: true,
+  }
 );
 
+// Explicitly cast the model so TypeScript sees it as a callable Model<ISubject>
+const Subject: Model<ISubject> =
+  (mongoose.models.Subject as Model<ISubject>) ||
+  mongoose.model<ISubject>("Subject", SubjectSchema);
 
-
-
-
-// Export
-const Subject = mongoose.models.Subject || mongoose.model('Subject', SubjectSchema);
 export default Subject;

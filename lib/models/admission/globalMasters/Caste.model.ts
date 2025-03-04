@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface ICaste extends Document {
+  session: string;
+  caste_name: string;
+}
 
-
-
-
-// Caste Schema
-const CasteSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        caste_name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const CasteSchema = new mongoose.Schema<ICaste>(
+  {
+    session: { type: String, required: true },
+    caste_name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Caste: Model<ICaste> =
+  (mongoose.models.Caste as Model<ICaste>) ||
+  mongoose.model<ICaste>("Caste", CasteSchema);
 
-
-
-
-// Export
-const Caste = mongoose.models.Caste || mongoose.model('Caste', CasteSchema);
 export default Caste;

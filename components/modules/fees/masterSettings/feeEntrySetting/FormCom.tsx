@@ -28,8 +28,7 @@ const FormCom = ({feeEntrySettings, setIsViewOpened, updateFeeEntrySetting, setU
 
 
     // School name
-    const [schoolName, setSchoolName] = useState();
-
+    const [schoolName, setSchoolName] = useState<string>('');
 
     // Opened Form
     const [openedFormName, setOpenedFormName] = useState('generate-single-receipt');

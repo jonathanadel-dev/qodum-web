@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface ICadetType extends Document {
+  session: string;
+  name: string;
+}
 
-
-
-
-// Cadet type Schema
-const CadetTypeSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const CadetTypeSchema = new mongoose.Schema<ICadetType>(
+  {
+    session: { type: String, required: true },
+    name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const CadetType: Model<ICadetType> =
+  (mongoose.models.CadetType as Model<ICadetType>) ||
+  mongoose.model<ICadetType>("CadetType", CadetTypeSchema);
 
-
-
-
-// Export
-const CadetType = mongoose.models.CadetType || mongoose.model('CadetType', CadetTypeSchema);
 export default CadetType;

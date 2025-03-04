@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IBloodGroup extends Document {
+  session: string;
+  blood_group: string;
+}
 
-
-
-
-// BloodGroup Schema
-const BloodGroupSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        blood_group:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const BloodGroupSchema = new mongoose.Schema<IBloodGroup>(
+  {
+    session: { type: String, required: true },
+    blood_group: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const BloodGroup: Model<IBloodGroup> =
+  (mongoose.models.BloodGroup as Model<IBloodGroup>) ||
+  mongoose.model<IBloodGroup>("BloodGroup", BloodGroupSchema);
 
-
-
-
-// Export
-const BloodGroup = mongoose.models.BloodGroup || mongoose.model('BloodGroup', BloodGroupSchema);
 export default BloodGroup;

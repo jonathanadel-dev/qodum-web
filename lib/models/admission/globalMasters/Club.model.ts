@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IClub extends Document {
+  session: string;
+  name: string;
+}
 
-
-
-
-// CLub Schema
-const ClubSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const ClubSchema = new mongoose.Schema<IClub>(
+  {
+    session: { type: String, required: true },
+    name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Club: Model<IClub> =
+  (mongoose.models.Club as Model<IClub>) ||
+  mongoose.model<IClub>("Club", ClubSchema);
 
-
-
-
-// Export
-const Club = mongoose.models.Club || mongoose.model('Club', ClubSchema);
 export default Club;

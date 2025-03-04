@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface ITransportMedium extends Document {
+  session: string;
+  transport_medium: string;
+}
 
-
-
-
-// Transport Medium Schema
-const TransportMediumSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        transport_medium:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const TransportMediumSchema = new mongoose.Schema<ITransportMedium>(
+  {
+    session: { type: String, required: true },
+    transport_medium: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const TransportMedium: Model<ITransportMedium> =
+  (mongoose.models.TransportMedium as Model<ITransportMedium>) ||
+  mongoose.model<ITransportMedium>("TransportMedium", TransportMediumSchema);
 
-
-
-
-// Export
-const TransportMedium = mongoose.models.TransportMedium || mongoose.model('TransportMedium', TransportMediumSchema);
 export default TransportMedium;

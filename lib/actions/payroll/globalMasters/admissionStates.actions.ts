@@ -67,35 +67,6 @@ export const fetchAdmissionStates = async () => {
 
 
 
-// Fetch admission states for dashboard
-export const fetchAdmissionStatesForDashboard = async () => {
-    try {
-    
-        // Database connection
-        connectToDb('accounts');
-
-
-        // Fetching active session naeme
-        const activeSession = await AcademicYear.findOne({is_active:1});
-        if(!activeSession) return 0;
-
-
-        // Creating states
-        const states = await AdmissionState.findOne({session:activeSession?.year_name}, {logo:1});
-
-
-        // Return
-        return JSON.parse(JSON.stringify(states));
-
-    } catch (err:any) {
-        console.log(`Error creating states: ${err.message}`);
-    };
-};
-
-
-
-
-
 // Toggle staff admission state
 export const toggleStaffAdmissionState = async () => {
     try {

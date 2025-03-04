@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface IReligion extends Document {
+  session: string;
+  religion_name: string;
+}
 
-
-
-
-// Religion Schema
-const ReligionSchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        religion_name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const ReligionSchema = new mongoose.Schema<IReligion>(
+  {
+    session: { type: String, required: true },
+    religion_name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Religion: Model<IReligion> =
+  (mongoose.models.Religion as Model<IReligion>) ||
+  mongoose.model<IReligion>("Religion", ReligionSchema);
 
-
-
-
-// Export
-const Religion = mongoose.models.Religion || mongoose.model('Religion', ReligionSchema);
 export default Religion;

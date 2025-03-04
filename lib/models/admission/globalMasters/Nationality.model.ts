@@ -1,25 +1,20 @@
-// Import
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
+export interface INationality extends Document {
+  session: string;
+  name: string;
+}
 
-
-
-
-// Nationality Schema
-const NationalitySchema = new mongoose.Schema(
-    {
-        session:{type:String, required:true},
-        name:{type:String, required:true}
-    },
-    {
-        timestamps:true
-    }
+const NationalitySchema = new mongoose.Schema<INationality>(
+  {
+    session: { type: String, required: true },
+    name: { type: String, required: true },
+  },
+  { timestamps: true }
 );
 
+const Nationality: Model<INationality> =
+  (mongoose.models.Nationality as Model<INationality>) ||
+  mongoose.model<INationality>("Nationality", NationalitySchema);
 
-
-
-
-// Export
-const Nationality = mongoose.models.Nationality || mongoose.model('Nationality', NationalitySchema);
 export default Nationality;
