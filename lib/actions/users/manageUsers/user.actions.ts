@@ -774,9 +774,11 @@ export const fetchUsers = async () => {
         // Fetching
         // const users = await User.find({});
         const users = await User
-            .find({session:activeSession?.year_name})
+            // .find({session:activeSession?.year_name})
+            .find()
             .select('-password')
             .lean();
+
 
         const serializableUsers = JSON.parse(JSON.stringify(users));
 

@@ -1,0 +1,18 @@
+model UserPermission {
+    id          Int      @id @default(autoincrement())
+    module_name String
+    sub_menu    String
+    add         Boolean  @default(false)
+    modify      Boolean  @default(false)
+    delete      Boolean  @default(false)
+    print       Boolean  @default(false)
+    read_only   Boolean  @default(false)
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+
+    // Parents
+    user_id Int
+    user    User @relation(fields: [user_id], references: [id])
+
+    @@unique([user_id, module_name, sub_menu])
+}

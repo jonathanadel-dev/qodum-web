@@ -10,18 +10,18 @@ model User {
     profile_picture   String?
     is_active         Boolean?
     enable_otp        Boolean?
-    permissions       Json?
     is_admin          Boolean?
+
     created_at        DateTime @default(now())
     updated_at        DateTime @updatedAt
 
     // Parents
     session       Int
     academic_year AcademicYear @relation(fields: [session], references: [id])
+    schools    School[]
+    // fee_types  FeeType[]
     // employee
 
     // Children
-    schools    School[]
-    //   fee_types  FeeType[]
+    permissions UserPermission[]
 }
-// TODO
