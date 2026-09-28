@@ -4,8 +4,9 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import ModulesGrid from './ModulesGrid';
 import Footer from '../Footer';
+import { CurrentUser } from '@/lib/auth/session';
 
-export default function HomePage({ user }: any) {
+export default function HomePage({ user }: {user: CurrentUser | null}) {
 
     return (
         <main className='min-h-screen bg-[#F6F8FB] px-3 py-3 md:px-5 lg:px-6'>

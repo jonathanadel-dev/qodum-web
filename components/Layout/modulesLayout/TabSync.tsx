@@ -2,7 +2,8 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTabsStore } from '@/store/tabStore';
-import { resolveBreadcrumb, getTabPath } from '@/components/utils/breadcrumb';
+import { resolveBreadcrumb } from '@/lib/breadcrumb';
+import { getTabPath } from '@/lib/utils';
 
 const TabSync = () => {
   const pathname = usePathname();

@@ -4,33 +4,33 @@ import Image from 'next/image';
 import {useEffect, useState} from 'react';
 import {ArrowRight, Home} from 'lucide-react';
 import modules from '@/constants/modulesHome';
+import { CurrentUser } from '@/lib/auth/session';
 
 
 // Main functions
-export default function ModulesGrid ({user}:any) {
+export default function ModulesGrid ({user}:{user: CurrentUser}) {
 
     // Permitted modules
-    const [permittedModules, setPermittedModules] = useState(['']);
+    const [permittedModules, setPermittedModules] = useState<string[]>([]);
 
 
     // Use effect
     useEffect(() => {
 
-        setPermittedModules(
-            user?.permissions
-                ?.filter(
-                    (p:any) =>
-                        p?.permissions?.filter(
-                            (pp:any) =>
-                                pp?.add ||
-                                pp?.modify ||
-                                pp?.delete ||
-                                pp?.print ||
-                                pp?.read_only
-                        ).length > 0
-                )
-                ?.map((p:any) => p?.name)
-        );
+        if (user?.is_admin) {
+            setPermittedModules(modules.map((m: any) => m.title));
+            return;
+        }
+
+        const granted = new Set<string>();
+
+        user?.permissions?.forEach((p) => {
+            if (p.add || p.modify || p.delete || p.print || p.read_only) {
+                granted.add(p.module_name);
+            }
+        });
+
+        setPermittedModules(Array.from(granted));
 
     }, [user]);
 

@@ -3,9 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { deepEqual } from '@/lib/utils';
+import { deepEqual, getTabPath } from '@/lib/utils';
 import { useFieldState, usePageStateStore } from '@/store/pageStateStore';
-import { getTabPath } from '@/components/utils/breadcrumb';
 
 interface UseCrudFormArgs<T> {
   emptyRecord: T & { id: string };

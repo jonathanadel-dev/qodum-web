@@ -117,7 +117,7 @@ export default function Header({ user }: { user: CurrentUser | null }) {
 
                 {/* Desktop Action Buttons */}
                 <div className='hidden items-center gap-2 lg:flex'>
-                    <DropdownMenuCom />
+                    <DropdownMenuCom user={user}/>
                     
                     <button 
                         onClick={() => fullScreenHandler(isFullscreen ? 'close' : 'open')}
@@ -182,9 +182,9 @@ export default function Header({ user }: { user: CurrentUser | null }) {
 
                 {/* Profile Section */}
                 <div className='flex items-center gap-3 pl-1'>
-                    {user?.profilePicture ? (
+                    {user?.profile_picture ? (
                         <Image
-                            src={user.profilePicture}
+                            src={user.profile_picture}
                             alt='User profile'
                             className='h-10 w-10 rounded-full border border-[#E8EDF2] object-cover bg-[#F7F9FB]'
                             width={40}

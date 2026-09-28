@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
-import { resolveBreadcrumb } from '@/components/utils/breadcrumb';
+import { resolveBreadcrumb } from '@/lib/breadcrumb';
 
 export default function BreadCrumb() {
   const pathname = usePathname();

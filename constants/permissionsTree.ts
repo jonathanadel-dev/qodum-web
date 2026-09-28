@@ -1,26 +1,9 @@
-// Imports
-import AccountsImage from '@/public/assets/Modules Icons/Menu icons/Accounts.png';
-import FessImage from '@/public/assets/Modules Icons/Menu icons/Fees.png';
-import AdmissionImage from '@/public/assets/Modules Icons/Menu icons/Admission.png';
-import PayrollImage from '@/public/assets/Modules Icons/Menu icons/Payroll.png';
-import StocksImage from '@/public/assets/Modules Icons/Menu icons/Stocks.png';
-import UsersImage from '@/public/assets/Modules Icons/Menu icons/Users.png';
-import AttendenceImage from '@/public/assets/Modules Icons/Menu icons/Attendance.png';
-import TimetableImage from '@/public/assets/Modules Icons/Menu icons/Time Table.png';
-import ExamanationImage from '@/public/assets/Modules Icons/Menu icons/Examination.png';
-import LibraryImage from '@/public/assets/Modules Icons/Menu icons/Library.png';
-import MarksImage from '@/public/assets/Modules Icons/Menu icons/Marks.png';
-
-
-
-
-// Modules
-const modules = [
+// Permission Modules
+export const permissionModules  = [
 
     // Admission
     {
         moduleName:'admission',
-        icon:AdmissionImage,
         subModules:[
             // Global Master
             {
@@ -286,7 +269,6 @@ const modules = [
     // Fees
     {
         moduleName:'fees',
-        icon:FessImage,
         subModules:[
             // Global Masters
             {
@@ -737,8 +719,6 @@ const modules = [
     // Attendance
     {
         moduleName:'attendance',
-        // icon:Megaphone,
-        icon:AttendenceImage,
         subModules:[
             // Global Masters
             {
@@ -888,8 +868,6 @@ const modules = [
     // Payroll
     {
         moduleName:'payroll',
-        // icon:Wallet,
-        icon:PayrollImage,
         subModules:[
             // Global Masters
             {
@@ -1208,7 +1186,6 @@ const modules = [
     // Marks Entry
     {
         moduleName:'marks-entry',
-        icon:MarksImage,
         subModules:[]
     },
 
@@ -1216,7 +1193,6 @@ const modules = [
     // Examinations
     {
         moduleName:'examinations',
-        icon:MarksImage,
         subModules:[]
     },
 
@@ -1224,7 +1200,6 @@ const modules = [
     // Time Table
     {
         moduleName:'time-table',
-        icon:TimetableImage,
         subModules:[
             // Global Masters
             {
@@ -1432,7 +1407,6 @@ const modules = [
     // Accounts
     {
         moduleName:'accounts',
-        icon:AccountsImage,
         subModules:[
             // Global Masters
             {
@@ -1610,8 +1584,6 @@ const modules = [
     // Stocks
     {
         moduleName:'stocks',
-        // icon:Box,
-        icon:StocksImage,
         subModules:[
             // Global Masters
             {
@@ -1777,7 +1749,6 @@ const modules = [
     // Library
     {
         moduleName:'library',
-        icon:LibraryImage,
         subModules:[]
     },
 
@@ -1785,7 +1756,6 @@ const modules = [
     // Users
     {
         moduleName:'users',
-        icon:UsersImage,
         subModules:[
             // Global Master
             {
@@ -1848,7 +1818,6 @@ const modules = [
     // Qodum Care
     {
         moduleName:'qodum-care',
-        icon:ExamanationImage,
         subModules:[
             // Global Master
             {
@@ -1870,10 +1839,3 @@ const modules = [
     }
 
 ];
-
-
-
-
-
-// Export
-export default modules;

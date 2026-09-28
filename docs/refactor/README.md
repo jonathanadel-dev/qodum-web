@@ -46,3 +46,5 @@ happening, what changed, how it was verified, and what it affects.
 | Sep 2026 | Architecture | Shared CRUD layer (form/buttons/print/view) built and applied to Create User; pattern for remaining ~70 modules |
 | Sep 2026 | Architecture | react-xlsx-wrapper replaced with exceljs for print/export |
 | Sep 2026 | Architecture | Decision: migrate MongoDB → PostgreSQL (Prisma) |
+| Sep 2026 | Architecture | Per-user permissions moved to PostgreSQL: `User` → `UserPermission` → `PermissionItem`, sparse and session-scoped |
+| Sep 2026 | Architecture | Decision: user CRUD through API routes with a shared `authorize()` check, not server actions |

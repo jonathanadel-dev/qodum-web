@@ -10,7 +10,6 @@ import { useUsersList, useStaffList, useSchoolsList } from '@/lib/hooks/useUserM
 import { useCrudForm } from '@/lib/hooks/useCrudForm';
 import { usePermission } from '@/lib/hooks/usePermission';
 import { useFieldState } from '@/store/pageStateStore';
-import { getTabPath } from '@/components/utils/breadcrumb';
 import { emptyUser } from '@/constants/emptyUser';
 import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
 import CrudButtons from '@/components/shared/crud/CrudButtons';
@@ -18,6 +17,7 @@ import { CurrentUser } from '@/lib/auth/session';
 import { toDbNumber } from '@/lib/validations/shared/number';
 import PrintButton from '@/components/shared/crud/PrintButton';
 import moment from 'moment';
+import { getTabPath } from '@/lib/utils';
 
 export default function FormCom ({ user }: { user: CurrentUser | null }) {
 

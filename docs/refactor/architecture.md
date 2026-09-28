@@ -171,3 +171,29 @@ with routes split by client (`api/erp/...` vs `api/mobile/...`) over
 shared, client-agnostic domain functions.
 
 ---
+
+## User authorization: per-user permissions in PostgreSQL, enforced in API routes
+
+**Found:** Permissions were an embedded array on the Mongo `User` document. Every new user was stamped with the full set (450+ entries, one per page across 12 modules) from a ~700-line hardcoded literal inside `createUser`, so the page catalog and the per-user grants were the same data, copied per user. Each entry carried both `main_menu` and `sub_menu`, but runtime lookups only ever used the module name and `sub_menu`. `sr_no` repeated within modules, so it couldn't be used for ordering either. None of the 76 files in `lib/actions` checks who is calling, so the only enforcement was the UI hiding buttons.
+
+**Root cause:** Nothing separated "which pages exist" from "what this user may do on them", and enforcement was only ever designed for page navigation (`proxy.ts`), not for the data-changing calls.
+
+**Fix:** Three tables, refining phase 2 of the migration entry above (`User.permissions` was first drafted as a `Json?` column and rejected):
+
+- `PermissionItem`: the catalog. One row per permissionable page, `[module_name, page_name]` unique, seeded once from `constants/permissionsTree.ts` via `prisma db seed`. Seeding is idempotent for additions but not for renames.
+- `UserPermission`: one row per grant, with the five action flags, unique on `[user_id, permission_item_id, session]`. Sparse (no row means no access, so a new user has zero rows) and scoped to an academic year, so a user can hold a page in one session and not the next. `onDelete: Cascade` on the user relation.
+- `User.session` was removed. An account persists across sessions, and only its grants are session-scoped. Grants do **not** carry forward when a new `AcademicYear` is activated.
+
+Conventions that came with it:
+
+- **Slugs:** `module_name` and `page_name` are stored as slugs matching the route (`fees`, `define-wing`). Display labels are derived by one `humanize()` function, with an acronym exceptions map.
+- **Thread rule:** a page with `threads` is only a grouping label. Each thread is the permission unit, matching the old data. Sub-modules are display-only and never reach the database.
+- **snake_case:** every field that mirrors a database column is snake_case, including the JWT payload and `CurrentUser`.
+- **Admin:** `is_admin` bypasses all checks and admins hold no `UserPermission` rows. The bypass exists in `proxy.ts`, `usePermission`, the modules grid, the sidebar, and `authorize()`.
+- **Two tiers:** unchanged from the JWT entry in `authentication.md`. The token carries only the flat module map, and the granular grants are read from Postgres per request.
+
+Enforcement uses API routes, not server actions, because routes can return 401/403/409 and fit SWR reads. A single `authorize(module_name, page_name, action)` helper runs at the top of every handler. `proxy.ts` does not match `/api/*`, so this helper is the only gate on those routes. `getCurrentUser()` re-reads the user on every call, so setting `is_active` to false takes effect immediately despite the 30-day token.
+
+**Verification:** The catalog seeds, and the seed script now reports the module and sub-module of a malformed tree entry instead of a generic Prisma error. An admin can sign in, pass `proxy.ts`, and see the modules grid, sidebar, and Create User buttons.
+
+**Impact:** Closes the "action-level checks deferred" item in `authentication.md`, once the routes exist. **Not done yet:** the `app/api/users/*` routes and `authorize()` (designed, not built); ~80 legacy components still read `sub_menu` and the nested permission shape; carry-forward of grants between sessions.

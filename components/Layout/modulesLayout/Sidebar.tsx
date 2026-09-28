@@ -18,22 +18,17 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
+import { humanize } from '@/lib/utils';
 
 // Types
 type Permission = {
-    sr_no?: number;
-    main_menu?: string;
-    sub_menu?: string;
+    module_name?: string;
+    page_name?: string;
     add?: boolean;
     modify?: boolean;
     delete?: boolean;
     print?: boolean;
     read_only?: boolean;
-};
-
-type UserModulePermission = {
-    name?: string;
-    permissions?: Permission[];
 };
 
 // Helpers
@@ -47,58 +42,44 @@ const hasPermission = (permission: Permission) => {
     );
 };
 
-const slugify = (value: string = '') => {
-    return value
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
-};
-
 // Main function
 export default function Sidebar({ user }: { user?: any }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const pathname = usePathname();
 
     const moduleSlug = pathname.split('/')[1] || '';
-    const currentModule = modules.find((module: any) => slugify(module.moduleName) === moduleSlug);
+    const currentModule = modules.find((module: any) => module.moduleName === moduleSlug);
 
-    const currentModulePermissions: Permission[] =
-        user?.permissions
-            ?.find((permissionModule: UserModulePermission) => permissionModule?.name === currentModule?.moduleName)
-            ?.permissions
-            ?.filter(hasPermission) || [];
+    const permittedPageNames = new Set(
+        (user?.permissions ?? [])
+            .filter((permission: Permission) => permission?.module_name === currentModule?.moduleName)
+            .filter(hasPermission)
+            .map((permission: Permission) => permission.page_name)
+            .filter(Boolean)
+    );
 
-    const permittedMainMenus = new Set(currentModulePermissions.map(permission => permission?.main_menu).filter(Boolean));
-    const permittedSubMenus = new Set(currentModulePermissions.map(permission => permission?.sub_menu).filter(Boolean));
+    const permittedSubModules = currentModule?.subModules
+        ?.map((subModule: any) => {
+            const permittedPages = subModule?.pages
+                ?.map((page: any) => {
+                    if (Array.isArray(page?.threads)) {
+                        const permittedThreads = user?.is_admin
+                            ? page.threads
+                            : page.threads.filter((thread: string) => permittedPageNames.has(thread));
 
-    const permittedPages = currentModule?.pages
-        ?.filter((page: any) => permittedMainMenus.has(page?.pageName))
-        ?.map((page: any) => {
-            const permittedSubPages =
-                page?.subPages
-                    ?.map((subPage: any) => {
-                        const subPageIsPermitted = permittedSubMenus.has(subPage?.subPageName);
-                        const permittedThreads = Array.isArray(subPage?.threads)
-                            ? subPage.threads.filter((thread: string) => permittedSubMenus.has(thread))
-                            : [];
+                        if (permittedThreads.length === 0) return null;
 
-                        if (!subPageIsPermitted && permittedThreads.length === 0) {
-                            return null;
-                        }
+                        return { ...page, threads: permittedThreads };
+                    }
 
-                        return {
-                            ...subPage,
-                            threads: Array.isArray(subPage?.threads)
-                                ? subPageIsPermitted ? subPage.threads : permittedThreads
-                                : undefined,
-                        };
-                    })
-                    .filter(Boolean) || [];
+                    const pageIsPermitted = user?.is_admin || permittedPageNames.has(page?.pageName);
+                    return pageIsPermitted ? page : null;
+                })
+                .filter(Boolean) || [];
 
-            if (permittedSubPages.length === 0) return null;
+            if (permittedPages.length === 0) return null;
 
-            return { ...page, subPages: permittedSubPages };
+            return { ...subModule, pages: permittedPages };
         })
         .filter(Boolean) || [];
 
@@ -113,7 +94,7 @@ export default function Sidebar({ user }: { user?: any }) {
         );
     }
 
-    if (permittedPages.length === 0) {
+    if (permittedSubModules.length === 0) {
         return (
             <div className='flex h-full w-auto items-center justify-center px-4 text-center bg-white'>
                 <div>
@@ -128,8 +109,7 @@ export default function Sidebar({ user }: { user?: any }) {
     }
 
     // Helper to check if a route is currently active
-    const isActiveRoute = (itemName: string) => {
-        const slug = slugify(itemName);
+    const isActiveRoute = (slug: string) => {
         return pathname === `/${moduleSlug}/${slug}`;
     };
 
@@ -193,7 +173,7 @@ export default function Sidebar({ user }: { user?: any }) {
                                         </div>
                                         <div className='text-left'>
                                             <p className='text-sm font-bold text-[#17233C] whitespace-nowrap'>
-                                                {currentModule.moduleName}
+                                                {humanize(currentModule.moduleName)}
                                             </p>
                                         </div>
                                     </div>
@@ -202,48 +182,48 @@ export default function Sidebar({ user }: { user?: any }) {
                                 <AccordionContent className='pb-0 pt-3'>
                                     <div className='max-h-[calc(100vh-180px)] overflow-y-auto pr-1 custom-sidebar-scrollbar'>
                                         <Accordion type='single' collapsible className='w-full'>
-                                            {permittedPages.map((page: any) => {
-                                                const hasSubPages = page?.subPages?.length > 0;
-                                                if (!hasSubPages) return null;
+                                            {permittedSubModules.map((subModule: any) => {
+                                                const hasPages = subModule?.pages?.length > 0;
+                                                if (!hasPages) return null;
 
                                                 // Check if any child route is active to highlight the parent
-                                                const isParentActive = page.subPages.some((sub: any) => {
-                                                    if (Array.isArray(sub.threads)) {
-                                                        return sub.threads.some((t: string) => isActiveRoute(t));
+                                                const isParentActive = subModule.pages.some((page: any) => {
+                                                    if (Array.isArray(page.threads)) {
+                                                        return page.threads.some((t: string) => isActiveRoute(t));
                                                     }
-                                                    return isActiveRoute(sub.subPageName);
+                                                    return isActiveRoute(page.pageName);
                                                 });
 
                                                 return (
-                                                    <AccordionItem key={page.pageName} value={page.pageName} className='border-none'>
+                                                    <AccordionItem key={subModule.subModuleName} value={subModule.subModuleName} className='border-none'>
                                                         <AccordionTrigger className={`mb-1 rounded-[9px] px-3 py-2.5 text-left text-[13px] font-semibold transition hover:no-underline w-full ${isParentActive ? 'bg-[#F2F9FD] text-[#2CABE3]' : 'text-[#455368] hover:bg-[#F7F9FB]'}`}>
                                                             <div className='flex items-center gap-2'>
-                                                                <span className='whitespace-nowrap'>{page.pageName}</span>
+                                                                <span className='whitespace-nowrap'>{humanize(subModule.subModuleName)}</span>
                                                                 <ChevronDown size={16} className="shrink-0 text-[#8390A1] transition-transform duration-200" />
                                                             </div>
                                                         </AccordionTrigger>
 
                                                         <AccordionContent className='pb-1 pt-0'>
                                                             <div className='ml-3 border-l border-[#E5EBF1] pl-3'>
-                                                                {page.subPages.map((subPage: any) => {
-                                                                    const hasThreads = Array.isArray(subPage?.threads) && subPage.threads.length > 0;
+                                                                {subModule.pages.map((page: any) => {
+                                                                    const hasThreads = Array.isArray(page?.threads) && page.threads.length > 0;
 
                                                                     if (hasThreads) {
                                                                         return (
-                                                                            <Accordion key={subPage.subPageName} type='single' collapsible className='w-full'>
-                                                                                <AccordionItem value={subPage.subPageName} className='border-none'>
+                                                                            <Accordion key={page.pageName} type='single' collapsible className='w-full'>
+                                                                                <AccordionItem value={page.pageName} className='border-none'>
                                                                                     <AccordionTrigger className='rounded-[8px] px-2 py-2 text-left text-[12px] font-medium text-[#536176] transition hover:bg-[#F7F9FB] hover:no-underline w-full'>
                                                                                         <div className='flex items-center gap-2'>
-                                                                                            <span className='whitespace-nowrap'>{subPage.subPageName}</span>
+                                                                                            <span className='whitespace-nowrap'>{humanize(page.pageName)}</span>
                                                                                             <ChevronDown size={14} className="shrink-0 text-[#8290A1] transition-transform duration-200" />
                                                                                         </div>
                                                                                     </AccordionTrigger>
 
                                                                                     <AccordionContent className='pb-1 pt-0'>
                                                                                         <div className='ml-2 flex flex-col gap-0.5'>
-                                                                                            {subPage.threads.map((thread: string) => {
+                                                                                            {page.threads.map((thread: string) => {
                                                                                                 const isSelected = isActiveRoute(thread);
-                                                                                                const href = `/${moduleSlug}/${slugify(thread)}`;
+                                                                                                const href = `/${moduleSlug}/${thread}`;
 
                                                                                                 return (
                                                                                                     <Link
@@ -251,7 +231,7 @@ export default function Sidebar({ user }: { user?: any }) {
                                                                                                         href={href}
                                                                                                         className={`group flex w-full items-center justify-between rounded-[7px] px-2.5 py-2 text-left text-[12px] transition ${isSelected ? 'bg-[#F2F9FD] font-medium text-[#2CABE3]' : 'text-[#687689] hover:bg-[#F7F9FB] hover:text-[#2CABE3]'}`}
                                                                                                     >
-                                                                                                        <span className='whitespace-nowrap'>{thread}</span>
+                                                                                                        <span className='whitespace-nowrap'>{humanize(thread)}</span>
                                                                                                         <MoveRight size={14} className={`shrink-0 transition ${isSelected ? 'translate-x-0 opacity-100' : '-translate-x-0.75 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}`} />
                                                                                                     </Link>
                                                                                                 );
@@ -263,18 +243,18 @@ export default function Sidebar({ user }: { user?: any }) {
                                                                         );
                                                                     }
 
-                                                                    // Normal Sub-Page (No Threads)
-                                                                    const isSelected = isActiveRoute(subPage.subPageName);
-                                                                    const href = `/${moduleSlug}/${slugify(subPage.subPageName)}`;
+                                                                    // Normal Page (No Threads)
+                                                                    const isSelected = isActiveRoute(page.pageName);
+                                                                    const href = `/${moduleSlug}/${page.pageName}`;
 
                                                                     return (
                                                                         <Link
-                                                                            key={subPage.subPageName}
+                                                                            key={page.pageName}
                                                                             href={href}
                                                                             className={`group flex w-full items-center justify-between rounded-[8px] px-2 py-2 text-left text-[12px] transition ${isSelected ? 'bg-[#F2F9FD] font-medium text-[#2CABE3]' : 'text-[#687689] hover:bg-[#F7F9FB] hover:text-[#2CABE3]'}`}
                                                                         >
                                                                             <div className='flex items-center gap-2'>
-                                                                                <span className='whitespace-nowrap'>{subPage.subPageName}</span>
+                                                                                <span className='whitespace-nowrap'>{humanize(page.pageName)}</span>
                                                                             </div>
                                                                             <MoveRight size={14} className={`shrink-0 transition ${isSelected ? 'translate-x-0 opacity-100' : '-translate-x-0.75 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}`} />
                                                                         </Link>

@@ -77,5 +77,5 @@ model AcademicYear {
     staff_types StaffType[]
 
     // Users
-    users User[]
+    user_permissions UserPermission[]
 }

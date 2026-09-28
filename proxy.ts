@@ -1,41 +1,22 @@
+// proxy.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { JWTPayload, jwtVerify } from 'jose'
 
 const COOKIE_NAME = 'qodum_session'
 
-export type Token = JWTPayload & {
-    userId: string
-    username: string,
-    isAdmin: boolean,
-    permissions: {
-        admission: boolean
-        fees: boolean
-        attendance: boolean,
-        payroll: boolean,
-        marksEntry: boolean,
-        examinations: boolean,
-        timeTable:  boolean,
-        accounts: boolean,
-        stocks: boolean,
-        library: boolean,
-        users: boolean,
-        qodumCare: boolean
-    }
-}
+const PROTECTED_MODULES = [
+    'admission', 'fees', 'attendance', 'payroll', 'marks-entry',
+    'examinations', 'time-table', 'accounts', 'stocks', 'library',
+    'users', 'qodum-care',
+] as const
 
-export const ROUTE_PERMISSIONS: Record<string, keyof Token['permissions']> = {
-    '/admission': 'admission',
-    '/fees': 'fees',
-    '/attendance': 'attendance',
-    '/payroll': 'payroll',
-    '/marks-entry': 'marksEntry',
-    '/examinations': 'examinations',
-    '/time-table': 'timeTable',
-    '/accounts': 'accounts',
-    '/stocks': 'stocks',
-    '/library': 'library',
-    '/users': 'users',
-    '/qodum-care': 'qodumCare'
+type ModuleKey = typeof PROTECTED_MODULES[number]
+
+export type Token = JWTPayload & {
+    user_id: number
+    user_name: string,
+    is_admin: boolean,
+    permissions: Record<ModuleKey, boolean>
 }
 
 async function verifySessionToken(request: NextRequest) {
@@ -57,7 +38,7 @@ export async function proxy(request: NextRequest) {
 
     const path = request.nextUrl.pathname
     const user = await verifySessionToken(request)
-    const routeKey = Object.keys(ROUTE_PERMISSIONS).find(prefix => path.startsWith(prefix))
+    const routeKey = PROTECTED_MODULES.find(m => path.startsWith(`/${m}`))
 
 
     if (!user && path !== '/sign-in') {
@@ -68,10 +49,9 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL('/', request.url))
     }
     
-    if (routeKey && !user.isAdmin && !user.permissions?.[ROUTE_PERMISSIONS[routeKey]]) {
+    if (routeKey && !user?.is_admin && !user?.permissions?.[routeKey]) {
         return NextResponse.redirect(new URL('/', request.url))
     }
-
 
     return NextResponse.next()
 }

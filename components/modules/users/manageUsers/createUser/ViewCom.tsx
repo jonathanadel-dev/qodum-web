@@ -1,9 +1,9 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import { useUsersList } from '@/lib/hooks/useUserModuleData';
-import { getTabPath } from '@/components/utils/breadcrumb';
 import { emptyUser } from '@/constants/emptyUser';
 import ListView from '@/components/shared/crud/ListView';
+import { getTabPath } from '@/lib/utils';
 
 export default function ViewCom () {
 

@@ -1,104 +1,103 @@
-'use server'
+// app/api/auth/login/route.ts
 import bcrypt from 'bcryptjs';
-import User from "@/lib/models/users/manageUsers/User.model";
-import { connectToDb } from "@/lib/mongoose";
+import { prisma } from '@/lib/prisma';
 import { loginSchema } from "@/lib/validations/auth/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { signToken } from '@/lib/auth/jwt';
 import { setAuthCookie } from '@/lib/auth/session';
 
+type UserPermissionWithItem = {
+  add: boolean
+  modify: boolean
+  delete: boolean
+  print: boolean
+  read_only: boolean
+  permission_item: { module_name: string }
+}
 
-function buildModulePermissions(
-  permissions: Array<{ name: string; permissions: any[] }> = []
-) {
+function buildModulePermissions(permissions: UserPermissionWithItem[] = []) {
   const map = {
     admission: false,
     fees: false,
     attendance: false,
     payroll: false,
-    marksEntry: false,
+    'marks-entry': false,
     examinations: false,
-    timeTable: false,
+    'time-table': false,
     accounts: false,
     stocks: false,
     library: false,
     users: false,
-    qodumCare: false,
+    'qodum-care': false,
   }
 
-  for (const group of permissions) {
-    const key = group.name.toLowerCase()
+  for (const permission of permissions) {
+    const key = permission.permission_item.module_name
 
-    const normalizedKey =
-      key === 'marks entry' ? 'marksEntry' :
-      key === 'time table' ? 'timeTable' :
-      key === 'qodum care' ? 'qodumCare' :
-      key
+    if (key in map) {
+      const hasAnyGrant =
+        permission.add || permission.modify || permission.delete || permission.print || permission.read_only
 
-    if (normalizedKey in map) {
-      map[normalizedKey as keyof typeof map] =
-        group.permissions.some((item) =>
-          Object.values(item).some(
-            (value) => typeof value === 'boolean' && value === true
-          )
-        )
+      if (hasAnyGrant) {
+        map[key as keyof typeof map] = true
+      }
     }
   }
 
   return map
 }
 
-
 export async function POST(request: NextRequest) {
-    try{
-        connectToDb('accounts')
-    
+    try {
         const body = await request.json()
         const result = loginSchema.safeParse(body)
-    
+
         if (!result.success) {
             return NextResponse.json(
                 { error: result.error.flatten().fieldErrors },
                 { status: 400 }
             )
         }
-    
+
         const { username, password } = result.data
-    
-        const user = await (User as any).findOne({ user_name: username })
+
+        const activeSession = await prisma.academicYear.findFirst({ where: { is_active: true } })
+
+        const user = await prisma.user.findUnique({
+            where: { user_name: username },
+            include: activeSession
+                ? { permissions: { where: { session: activeSession.id }, include: { permission_item: true } } }
+                : undefined,
+        })
 
         if (!user) {
-          return NextResponse.json(
-            { error: 'Invalid username or password' },
-            { status: 401 }
-          )
+            return NextResponse.json(
+                { error: 'Invalid username or password' },
+                { status: 401 }
+            )
         }
-    
-        const match = bcrypt.compareSync(password, user.password);
-    
+
+        const match = bcrypt.compareSync(password, user.password)
+
         if (!match) {
-          return NextResponse.json(
-            { error: 'Invalid username or password' },
-            { status: 401 }
-          )
+            return NextResponse.json(
+                { error: 'Invalid username or password' },
+                { status: 401 }
+            )
         }
-    
-        console.log({
-          userId: user._id.toString(),
-          username: user.user_name,
-          isAdmin: user.is_admin,
-          permissions: buildModulePermissions(user.permissions)
-        });
+
+        const permissions = buildModulePermissions((user as any).permissions ?? [])
+
         const token = await signToken({
-            userId: user._id.toString(),
-            username: user.user_name,
-            isAdmin: user.is_admin,
-            permissions: buildModulePermissions(user.permissions)
+            user_id: user.id,
+            user_name: user.user_name,
+            is_admin: user.is_admin,
+            permissions,
         })
-        await setAuthCookie(token);
-    
+        await setAuthCookie(token)
+
         return NextResponse.json(
-            { userId: user._id.toString(), username: user.user_name, isAdmin: user.is_admin, permissions: buildModulePermissions(user.permissions) },
+            { user_id: user.id, user_name: user.user_name, is_admin: user.is_admin, permissions },
             { status: 200 }
         )
     } catch (error) {

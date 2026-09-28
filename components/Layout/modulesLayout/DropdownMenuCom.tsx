@@ -3,33 +3,44 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {Menu} from 'lucide-react';
 import modules from '@/constants/modulesHome';
-import {AuthContext} from '@/context/AuthContext';
 import {useContext, useEffect, useState} from 'react';
 import {GlobalStateContext} from '@/context/GlobalStateContext';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import { CurrentUser } from '@/lib/auth/session';
 
 
 
 
 
 // Main function
-const DropdownMenuCom = () => {
+const DropdownMenuCom = ({user}: {user: CurrentUser}) => {
 
     // Opened pages
     const {setOpenedPages} = useContext(GlobalStateContext);
 
 
-    // User
-    const {user} = useContext(AuthContext);
-
-
     // Permitted modules
-    const [permittedModules, setPermittedModules] = useState(['']);
+    const [permittedModules, setPermittedModules] = useState<string[]>([]);
 
 
     // Use effect
     useEffect(() => {
-        setPermittedModules(user?.permissions?.filter((p:any) => p?.permissions?.filter((pp:any) => pp?.add || pp?.modify || pp?.delete || pp?.print || pp?.read_only)?.length > 0)?.map((p:any) => p?.name));
+
+        if (user?.is_admin) {
+            setPermittedModules(modules.map((m: any) => m.title));
+            return;
+        }
+
+        const granted = new Set<string>();
+
+        user?.permissions?.forEach((p) => {
+            if (p.add || p.modify || p.delete || p.print || p.read_only) {
+                granted.add(p.module_name);
+            }
+        });
+
+        setPermittedModules(Array.from(granted));
+
     }, [user]);
 
     return (
@@ -44,6 +55,7 @@ const DropdownMenuCom = () => {
             >
                 {modules.filter((module:any) => permittedModules?.includes(module.title)).map((module:any) => (
                     <Link
+                        key={module.title}
                         href={`/${module.title.toLowerCase().replace(/\s+/g,"-")}`}
                         onClick={() => setOpenedPages([])}
                         target='_blank'

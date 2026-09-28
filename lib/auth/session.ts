@@ -1,36 +1,29 @@
 import { cookies } from 'next/headers'
-import { connectToDb } from "@/lib/mongoose";
+import { prisma } from '@/lib/prisma'
 import { verifyToken } from './jwt'
 import { JWTPayload } from 'jose'
-import User from '../models/users/manageUsers/User.model';
 
 const COOKIE_NAME = 'qodum_session'
 
 export type CurrentUser = {
-    id: string
-    session: string
+    id: number
     name: string
-    username: string
-    designation: string
-    email: string
-    employee: string
-    mobile: number
-    profilePicture: string
-    isActive: boolean
+    user_name: string
+    designation: string | null
+    email: string | null
+    mobile: string | null
+    profile_picture: string | null
+    is_active: boolean | null
     permissions: {
-        name: string
-        permissions: {
-            sr_no: number
-            main_menu: string
-            sub_menu: string
-            add: boolean
-            modify: boolean
-            delete: boolean
-            print: boolean
-            read_only: boolean
-        }[]
+        module_name: string
+        page_name: string
+        add: boolean
+        modify: boolean
+        delete: boolean
+        print: boolean
+        read_only: boolean
     }[]
-    isAdmin: boolean
+    is_admin: boolean | null
 }
 
 export async function setAuthCookie(token: string) {
@@ -57,35 +50,55 @@ export async function clearAuthCookie() {
 }
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
-    try{
-
-        connectToDb('accounts');
+    try {
         const payload = await getUserFromCookie()
-        if (!payload || typeof payload.userId !== 'string') return null
-    
-        const user = await User
-            .findById(payload.userId)
-            .select('-password -is_reset_password -schools -fee_types -createdAt -updatedAt -__v')
-            .lean() as any;
-    
+        if (!payload || typeof payload.user_id !== 'number') return null
+
+        const activeSession = await prisma.academicYear.findFirst({ where: { is_active: true } })
+
+        const user = await prisma.user.findUnique({
+            where: { id: payload.user_id },
+            omit: { password: true, is_reset_password: true },
+            include: {
+                permissions: {
+                    where: { session: activeSession?.id ?? -1 },
+                    select: {
+                        add: true,
+                        modify: true,
+                        delete: true,
+                        print: true,
+                        read_only: true,
+                        permission_item: { select: { module_name: true, page_name: true } },
+                    },
+                },
+            },
+        })
+
         if (!user) return null
-    
+
+        const permissions = user.permissions.map((p) => ({
+            module_name: p.permission_item.module_name,
+            page_name: p.permission_item.page_name,
+            add: p.add,
+            modify: p.modify,
+            delete: p.delete,
+            print: p.print,
+            read_only: p.read_only,
+        }))
+
         return {
-            id: user._id.toString(),
-            session: user.session,
+            id: user.id,
             name: user.name,
-            username: user.user_name,
+            user_name: user.user_name,
             designation: user.designation,
             email: user.email,
-            employee: user.employee,
             mobile: user.mobile,
-            profilePicture: user.profile_picture,
-            isActive: user.is_active,
-            permissions: user.permissions,
-            isAdmin: user.is_admin
+            profile_picture: user.profile_picture,
+            is_active: user.is_active,
+            permissions,
+            is_admin: user.is_admin,
         }
-
     } catch (error) {
-        return null;
+        return null
     }
 }

@@ -16,12 +16,42 @@ model User {
     updated_at        DateTime @updatedAt
 
     // Parents
-    session       Int
-    academic_year AcademicYear @relation(fields: [session], references: [id])
-    schools    School[]
+    schools       School[]
     // fee_types  FeeType[]
     // employee
 
     // Children
-    permissions UserPermission[]
+    permissions   UserPermission[]
+}
+
+model PermissionItem {
+    id        Int    @id @default(autoincrement())
+    module_name String
+    page_name  String
+
+    // Children
+    user_permissions UserPermission[]
+
+    @@unique([module_name, page_name])
+}
+
+model UserPermission {
+    id         Int      @id @default(autoincrement())
+    add        Boolean  @default(false)
+    modify     Boolean  @default(false)
+    delete     Boolean  @default(false)
+    print      Boolean  @default(false)
+    read_only  Boolean  @default(false)
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    // Parents
+    user_id            Int
+    user               User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    permission_item_id Int
+    permission_item    PermissionItem @relation(fields: [permission_item_id], references: [id])
+    session            Int
+    academic_year      AcademicYear   @relation(fields: [session], references: [id])
+
+    @@unique([user_id, permission_item_id, session])
 }

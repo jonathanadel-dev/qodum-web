@@ -5,7 +5,6 @@ import {Toaster} from '@/components/ui/toaster';
 import {ABeeZee} from 'next/font/google';
 import {GlobalStateProvider} from '@/context/GlobalStateContext';
 import {AuthProvider} from '@/context/AuthContext';
-import { prisma } from '@/lib/prisma';
 
 
 // Configs

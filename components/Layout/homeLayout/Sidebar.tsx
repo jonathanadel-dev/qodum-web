@@ -1,13 +1,12 @@
 'use client';
-import Image from 'next/image';
-import modules from '@/constants/modulesHome';
-import { Home, LayoutDashboard, LogOut, Settings, ShieldCheck, User, UserRound, } from 'lucide-react';
+import { Home, LayoutDashboard, LogOut, Settings, ShieldCheck, UserRound, } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { CurrentUser } from '@/lib/auth/session';
 
 
 // Main function
-export default function Sidebar ({ user }: { user?: any }) {
+export default function Sidebar ({ user }: {user: CurrentUser | null}) {
 
     const router = useRouter();
     const pathname = usePathname();

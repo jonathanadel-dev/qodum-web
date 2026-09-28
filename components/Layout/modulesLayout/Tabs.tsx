@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTabsStore } from '@/store/tabStore';
 import { usePageStateStore } from '@/store/pageStateStore';
-import { getModuleRoot, getModuleSlug } from '@/components/utils/breadcrumb';
+import { getModuleRoot, getModuleSlug } from '@/lib/utils';
 
 export default function Tabs() {
   const pathname = usePathname();
