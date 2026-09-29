@@ -1,12 +1,13 @@
+// components/modules/users/manageUsers/createUser/FormCom.tsx
 'use client';
 import { usePathname } from 'next/navigation';
 import { Form } from '@/components/ui/form';
 import LoadingIcon from '@/components/utils/LoadingIcon';
 import { useToast } from '@/components/ui/use-toast';
 import { CreateUserValidation, UpdateUserValidation } from '@/lib/validations/users/manageUsers/user.validation';
-import { createUser, deleteUser, modifyUser } from '@/lib/actions/users/manageUsers/user.actions';
+import { createUser, deleteUser, modifyUser } from '@/lib/api/users';
 import { uploadUserImage } from '@/lib/actions/image.actions';
-import { useUsersList, useStaffList, useSchoolsList } from '@/lib/hooks/useUserModuleData';
+import { useUsersList, useSchoolsList } from '@/lib/hooks/useUserModuleData';
 import { useCrudForm } from '@/lib/hooks/useCrudForm';
 import { usePermission } from '@/lib/hooks/usePermission';
 import { useFieldState } from '@/store/pageStateStore';
@@ -14,7 +15,6 @@ import { emptyUser } from '@/constants/emptyUser';
 import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
 import CrudButtons from '@/components/shared/crud/CrudButtons';
 import { CurrentUser } from '@/lib/auth/session';
-import { toDbNumber } from '@/lib/validations/shared/number';
 import PrintButton from '@/components/shared/crud/PrintButton';
 import moment from 'moment';
 import { getTabPath } from '@/lib/utils';
@@ -31,7 +31,6 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
 
   // Data fetching
   const { users, mutateUsers } = useUsersList();
-  const staff = useStaffList();
   const schools = useSchoolsList();
 
 
@@ -65,11 +64,10 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
     actions: {
       create: async (values) => {
         if (users.map((r: any) => r.user_name).includes(values.user_name)) {
-          toast({ title: 'User already exists', variant: 'error' });
-          throw new Error('duplicate');
+          throw new Error('User already exists');
         }
         const profile_picture = await resolveProfilePicture(values.name, '');
-        await createUser({ ...values, profile_picture, mobile: toDbNumber(values.mobile) });
+        await createUser({ ...values, profile_picture });
         toast({ title: 'Added Successfully!' });
       },
       modify: async (values) => {
@@ -77,7 +75,6 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
         await modifyUser({
           ...values,
           profile_picture,
-          mobile: toDbNumber(values.mobile),
           password: values.password || undefined,
         });
         toast({ title: 'Updated Successfully!' });
@@ -92,6 +89,9 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
       setFile(null);
       setImgSrc('');
     },
+    onError: (error) => {
+      toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
+    },
   });
 
 
@@ -103,13 +103,13 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
     { type: 'text', name: 'designation', label: 'Designation' },
     { type: 'text', name: 'email', label: 'Email' },
     { type: 'number', name: 'mobile', label: 'Mobile' },
-    {
-      type: 'select',
-      name: 'employee',
-      label: 'Employee',
-      loading: staff.length > 0 && !staff[0]?.staff_registration?.first_name,
-      options: staff.map((s: any) => ({ value: s?.staff_registration?.first_name, label: s?.staff_registration?.first_name })),
-    },
+    // TODO: employee is not in the Prisma User model yet, so it can't be saved
+    // {
+    //   type: 'select',
+    //   name: 'employee',
+    //   label: 'Employee',
+    //   options: [],
+    // },
     {
       type: 'multiselect',
       name: 'schools',
@@ -117,7 +117,7 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
       selectAll: true,
       span: 'full',
       loading: schools.length > 0 && !schools[0]?.school_name,
-      options: schools.map((s: any) => ({ value: s.school_name, label: s.school_name })),
+      options: schools.map((s: any) => ({ value: String(s.id), label: s.school_name })),
     },
   ];
   const toggles: FieldConfig[] = [
@@ -178,8 +178,8 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
                       { title: 'Name', width: 100, value: (u:any) => u?.name },
                       { title: 'Mobile No.', width: 75, value: (u:any) => u?.mobile },
                       { title: 'Active', width: 75, value: (u:any) => (u?.is_active ? 'True' : 'False') },
-                      { title: 'Created Date', width: 75, value: (u:any) => moment(u?.createdAt).format('D-MMM-yy') },
-                      { title: 'Modified Date', width: 100, value: (u:any) => moment(u?.updatedAt).format('D-MMM-yy') },
+                      { title: 'Created Date', width: 75, value: (u:any) => moment(u?.created_at).format('D-MMM-yy') },
+                      { title: 'Modified Date', width: 100, value: (u:any) => moment(u?.updated_at).format('D-MMM-yy') },
                     ]}
                   />
                 }  

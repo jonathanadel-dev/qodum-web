@@ -45,7 +45,7 @@ function deriveColumns(emptyRecord: Record<string, any>, extraHidden: string[] =
     });
 }
 function hydrateRecord(row: any, emptyRecord: Record<string, any>) {
-    const record: any = { id: row._id };
+    const record: any = { id: String(row.id) };
     for (const key of Object.keys(emptyRecord)) {
         if (key === 'id') continue;
         const raw = row[key];
@@ -114,7 +114,7 @@ export default function ListView<T>({ title, data, isLoading, emptyRecord, tabPa
 
 
     // Get ID
-    const getId = (u: any) => u._id;
+    const getId = (u: any) => u.id;
 
 
     // Select handler

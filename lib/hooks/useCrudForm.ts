@@ -1,3 +1,4 @@
+// lib/hooks/useCrudForm.ts
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,9 +17,10 @@ interface UseCrudFormArgs<T> {
     remove: (id: string) => Promise<any>;
   };
   onDone?: () => void;
+  onError?: (error: unknown) => void;
 }
 
-export function useCrudForm<T extends Record<string, any>>({ emptyRecord, updateSchema, createSchema, actions, onDone }: UseCrudFormArgs<T>) {
+export function useCrudForm<T extends Record<string, any>>({ emptyRecord, updateSchema, createSchema, actions, onDone, onError }: UseCrudFormArgs<T>) {
 
   // Store and path
   const pathname = usePathname();
@@ -54,7 +56,7 @@ export function useCrudForm<T extends Record<string, any>>({ emptyRecord, update
     return !deepEqual(originalValues, form.getValues());
   };
 
-  
+
   // Reset
   const reset = () => {
     clearPage(tabPath);
@@ -70,6 +72,9 @@ export function useCrudForm<T extends Record<string, any>>({ emptyRecord, update
       else if (isDirty()) await actions.modify({ ...values, id: record.id } as T & { id: string });
       onDone?.();
       reset();
+    } catch (error) {
+      if (!onError) throw error;
+      onError(error);
     } finally {
       setIsLoading(false);
     }
@@ -83,6 +88,9 @@ export function useCrudForm<T extends Record<string, any>>({ emptyRecord, update
       await actions.remove(record.id);
       onDone?.();
       reset();
+    } catch (error) {
+      if (!onError) throw error;
+      onError(error);
     } finally {
       setIsLoading(false);
     }

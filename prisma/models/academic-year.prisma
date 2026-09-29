@@ -1,5 +1,5 @@
 model AcademicYear {
-    id        Int      @id @default(autoincrement())
+    id         Int      @id @default(autoincrement())
     year_name  String   @unique
     start_date DateTime
     end_date   DateTime

@@ -1,7 +1,7 @@
 import useSWR from 'swr';
-import { fetchUsers } from '@/lib/actions/users/manageUsers/user.actions';
 import { fetchStaff } from '@/lib/actions/payroll/globalMasters/staff.actions';
 import { fetchGlobalSchoolDetails } from '@/lib/actions/fees/globalMasters/defineSchool/schoolGlobalDetails.actions';
+import { fetchUsers } from '../api/users';
 
 export const useUsersList = () => {
   const { data, mutate, isLoading } = useSWR('users-list', fetchUsers, { fallbackData: [] });

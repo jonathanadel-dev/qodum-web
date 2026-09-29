@@ -19,7 +19,7 @@ export default function ViewCom () {
       isLoading={isLoading}
       emptyRecord={emptyUser}
       tabPath={tabPath}
-      hidden={["profile_picture", "enable_otp"]}
+      hidden={["profile_picture", "enable_otp", "schools"]}
     />
   );
 };
