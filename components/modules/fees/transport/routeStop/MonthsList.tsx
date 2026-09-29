@@ -1,6 +1,6 @@
 // Imports
 import {ChevronDown, ChevronsUpDown} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Command, CommandItem, CommandList} from '@/components/ui/command';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

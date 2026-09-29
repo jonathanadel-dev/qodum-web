@@ -9,7 +9,7 @@ import {AuthContext} from '@/context/AuthContext';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useContext, useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchRouteStops} from '@/lib/actions/fees/transport/routeStop.actions';
 import {fetchVehicleRoutes} from '@/lib/actions/fees/transport/vehicleRoute.actions';
 import {fetchVehiclesDetails} from '@/lib/actions/fees/transport/vehicleDetails.actions';

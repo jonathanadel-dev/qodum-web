@@ -3,7 +3,7 @@
 import {ChevronDown} from 'lucide-react';
 import {useContext, useEffect, useState} from 'react';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchUsers, modifyUserPermissions} from '@/lib/actions/users/manageUsers/user.actions';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import PermissionsList from './PermissionsList';

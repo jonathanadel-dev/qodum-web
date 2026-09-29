@@ -10,12 +10,12 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import {JobValidation} from '@/lib/validations/payroll/globalMasters/job.validation';
 import {createJob, deleteJob, modifyJob} from '@/lib/actions/payroll/globalMasters/job.actions';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import { createAdmissionStates, fetchAdmissionStates, toggleStaffAdmissionState } from '@/lib/actions/payroll/globalMasters/admissionStates.actions';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

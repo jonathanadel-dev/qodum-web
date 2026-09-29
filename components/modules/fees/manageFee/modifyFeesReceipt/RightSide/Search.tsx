@@ -5,7 +5,7 @@ import {useEffect, useState} from 'react';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {fetchStudentPayments} from '@/lib/actions/fees/manageFee/payment.actions';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';

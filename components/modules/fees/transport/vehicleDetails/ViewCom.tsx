@@ -3,7 +3,7 @@ import {Button} from '@/components/ui/button';
 import {ChevronsUpDown, X} from 'lucide-react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Command, CommandEmpty, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

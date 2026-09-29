@@ -2,7 +2,7 @@
 import {useEffect, useState} from 'react';
 import {Checkbox} from '@/components/ui/checkbox';
 import {ChevronDown, ChevronsUpDown} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Command, CommandItem, CommandList} from '@/components/ui/command';
 import {fetchBankLedgers} from '@/lib/actions/accounts/accounts/bankLedger.actions';
 import {fetchGeneralLedgers} from '@/lib/actions/accounts/accounts/generalLedger.actions';

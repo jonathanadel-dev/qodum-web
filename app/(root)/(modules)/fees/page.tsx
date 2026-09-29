@@ -1,7 +1,7 @@
 'use client';
 // Imports
 import {Suspense} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import Fees from '@/components/Layout/pagesComponents/Fees';
 
 

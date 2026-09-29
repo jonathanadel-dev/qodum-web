@@ -1,17 +1,17 @@
 'use client';
 // Imports
 import {useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchPayments} from '@/lib/actions/fees/manageFee/payment.actions';
-import FeesCardsOne from '@/components/dashboards/feesDashboard/FeesCardsOne';
-import CollectionSummary from '@/components/dashboards/feesDashboard/CollectionSummary';
-import PaymodeSummaryCard from '@/components/dashboards/feesDashboard/PaymodeSummaryCard';
-import EstimatedCollection from '@/components/dashboards/feesDashboard/EstimatedCollection';
-import DefaulterStatistics from '@/components/dashboards/feesDashboard/DefaulterStastistics';
+import FeesCardsOne from '@/components/modules/dashboards/feesDashboard/FeesCardsOne';
+import CollectionSummary from '@/components/modules/dashboards/feesDashboard/CollectionSummary';
+import PaymodeSummaryCard from '@/components/modules/dashboards/feesDashboard/PaymodeSummaryCard';
+import EstimatedCollection from '@/components/modules/dashboards/feesDashboard/EstimatedCollection';
+import DefaulterStatistics from '@/components/modules/dashboards/feesDashboard/DefaulterStastistics';
 import {fetchClasses} from '@/lib/actions/fees/globalMasters/defineClassDetails/class.actions';
 import {fetchStudentsRegistrationFees} from '@/lib/actions/admission/admission/student.actions';
-import RecentTransactionsCard from '@/components/dashboards/feesDashboard/RecentTransactionsCard';
-import TransactionHistoryOfLast30Days from '@/components/dashboards/feesDashboard/TransactionHistoryOfLast30Days';
+import RecentTransactionsCard from '@/components/modules/dashboards/feesDashboard/RecentTransactionsCard';
+import TransactionHistoryOfLast30Days from '@/components/modules/dashboards/feesDashboard/TransactionHistoryOfLast30Days';
 import {fetchActiveAcademicYear} from '@/lib/actions/accounts/globalMasters/defineSession/defineAcademicYear.actions';
 import {feesDashboardDefaulterStudentsData, fetchFeesDashboardAdmittedStudents} from '@/lib/actions/admission/admission/admittedStudent.actions';
 

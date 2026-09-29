@@ -13,7 +13,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {FeeOpeningBalanceSettingValidation} from '@/lib/validations/fees/masterSettings/feeOpeningBalanceSetting.validation';
 import { fetchTypes } from '@/lib/actions/fees/feeMaster/feeMaster/type.actions';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import { AuthContext } from '@/context/AuthContext';
 
 

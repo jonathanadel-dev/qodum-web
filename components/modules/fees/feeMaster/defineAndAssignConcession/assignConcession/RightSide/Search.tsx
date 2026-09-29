@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import {useEffect, useState} from 'react';
 import {Input} from '@/components/ui/input';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {FormControl, FormItem} from '@/components/ui/form';
 import {ChevronDown, Search as SearchIcon} from 'lucide-react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';

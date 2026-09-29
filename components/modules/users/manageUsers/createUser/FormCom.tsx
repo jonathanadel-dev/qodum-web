@@ -2,16 +2,16 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import { Form } from '@/components/ui/form';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import { useToast } from '@/components/ui/use-toast';
 import { CreateUserValidation, UpdateUserValidation } from '@/lib/validations/users/manageUsers/user.validation';
-import { createUser, deleteUser, modifyUser } from '@/lib/api/users';
+import { createUser, deleteUser, modifyUser } from '@/api/users';
 import { uploadUserImage } from '@/lib/actions/image.actions';
-import { useUsersList, useSchoolsList } from '@/lib/hooks/useUserModuleData';
+import { useUsersList, useSchoolsList } from '@/lib/hooks/useData';
 import { useCrudForm } from '@/lib/hooks/useCrudForm';
 import { usePermission } from '@/lib/hooks/usePermission';
 import { useFieldState } from '@/store/pageStateStore';
-import { emptyUser } from '@/constants/emptyUser';
+import { emptyUser } from '@/lib/emptyRecords/emptyUser';
 import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
 import CrudButtons from '@/components/shared/crud/CrudButtons';
 import { CurrentUser } from '@/lib/auth/session';
@@ -30,8 +30,8 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
 
 
   // Data fetching
-  const { users, mutateUsers } = useUsersList();
-  const schools = useSchoolsList();
+  const { data: users, mutate: mutateUsers } = useUsersList();
+  const { data: schools } = useSchoolsList();
 
 
   // Permissions

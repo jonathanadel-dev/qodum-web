@@ -2,8 +2,8 @@
 import moment from 'moment';
 import {AuthContext} from '@/context/AuthContext';
 import {useState, useEffect, useContext} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import {ChevronRight, ChevronLeft, ChevronDown} from 'lucide-react';
 import {fetchStreams} from '@/lib/actions/admission/globalMasters/stream.actions';
 import {fetchSubjects} from '@/lib/actions/admission/globalMasters/subject.actions';

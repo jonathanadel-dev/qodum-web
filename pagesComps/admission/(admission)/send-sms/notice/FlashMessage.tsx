@@ -5,8 +5,8 @@ import {useEffect, useState} from 'react';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
 import {ChevronDown, SendHorizonal} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import {uploadFlashMessageImage} from '@/lib/actions/image.actions';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
   

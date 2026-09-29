@@ -10,7 +10,7 @@ import {Form} from '@/components/ui/form';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import StaffSalaryHeads from './forms/StaffSalaryHeads';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import StaffRegistration from './forms/StaffRegistration';
 import StaffSalaryDetails from './forms/StaffSalaryDetails';
 import {uploadStaffImage, uploadStaffPdf} from '@/lib/actions/image.actions';

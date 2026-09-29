@@ -10,7 +10,7 @@ import {Calendar} from '@/components/ui/calendar';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {CalendarIcon, ChevronDown} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {fetchClasses} from '@/lib/actions/fees/globalMasters/defineClassDetails/class.actions';
 import {createSlot, fetchSlots} from '@/lib/actions/admission/admission/entranceTest/slot.actions';

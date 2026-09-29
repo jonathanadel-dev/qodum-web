@@ -15,7 +15,7 @@ import {useEffect, useState} from 'react';
 import {Form} from '@/components/ui/form';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {uploadStudentImage} from '@/lib/actions/image.actions';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {AdmittedStudentValidation} from '@/lib/validations/admission/admission/admittedStudent.validation';

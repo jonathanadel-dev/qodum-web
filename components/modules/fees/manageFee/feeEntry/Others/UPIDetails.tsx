@@ -2,7 +2,7 @@
 import axios from 'axios';
 import {useEffect, useState} from 'react';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

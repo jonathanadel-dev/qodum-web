@@ -5,7 +5,7 @@ import FormCom from '@/components/modules/payroll/globalMasters/staff-applicatio
 import ViewCom from '@/components/modules/payroll/globalMasters/staff-application/ViewCom';
 import {fetchStaffApplication} from '@/lib/actions/payroll/globalMasters/staffApplication.actions';
 import { fetchAdmissionStates } from '@/lib/actions/payroll/globalMasters/admissionStates.actions';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

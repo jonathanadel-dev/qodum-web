@@ -3,7 +3,7 @@
 import axios from 'axios';
 import {useEffect, useState} from 'react';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import ViewCom from '@/components/modules/fees/manageFee/feeEntry/ViewCom';
 import FormCom from '@/components/modules/fees/manageFee/feeEntry/FormCom';
 import FeeReceipt from '@/components/modules/fees/manageFee/feeEntry/Others/FeeReceipt';

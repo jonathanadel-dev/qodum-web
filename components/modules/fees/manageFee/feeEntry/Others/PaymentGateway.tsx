@@ -3,8 +3,8 @@ import axios from 'axios';
 import QRCodeLib from 'qrcode';
 import {useEffect, useState} from 'react';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
-import PaymentButton from '@/components/utils/PaymentButton';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import PaymentButton from '@/components/shared/PaymentButton';
 
 
 

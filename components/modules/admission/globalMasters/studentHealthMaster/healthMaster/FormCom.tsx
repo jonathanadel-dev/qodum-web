@@ -12,7 +12,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {HealthMasterValidation} from '@/lib/validations/admission/globalMasters/studentHealthMaster/healthMaster.validation';
 import {createHealthMaster, deleteHealthMaster, modifyHealthMaster} from '@/lib/actions/admission/globalMasters/studentHealthMaster/healthMaster.actions';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

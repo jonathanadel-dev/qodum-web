@@ -3,7 +3,7 @@
 import {useState} from 'react';
 import Sidebar from './Sidebar';
 import PaymentsPdf from './PaymentsPdf';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

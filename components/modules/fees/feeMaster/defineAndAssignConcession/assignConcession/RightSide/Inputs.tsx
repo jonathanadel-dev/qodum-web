@@ -2,7 +2,7 @@
 import {ChevronDown} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchTypes} from '@/lib/actions/fees/feeMaster/feeMaster/type.actions';
 import {fetchInstallments} from '@/lib/actions/fees/feeMaster/feeMaster/installment.actions';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';

@@ -7,7 +7,7 @@ import {Checkbox} from '@/components/ui/checkbox';
 import {useToast} from '@/components/ui/use-toast';
 import SetDueLimit from './draggables/SetDueLimit';
 import DefineGroup from './draggables/DefineGroup';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {ChevronDown, ChevronsUpDown} from 'lucide-react';
 import DefineRouteStop from './draggables/DefineRouteStop';
 import LateFeeSettings from './draggables/LateFeeSettings';

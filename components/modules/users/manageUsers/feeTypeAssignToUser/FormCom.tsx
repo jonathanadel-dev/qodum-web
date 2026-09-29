@@ -5,7 +5,7 @@ import FeeTypesList from './FeeTypesList';
 import {AuthContext} from '@/context/AuthContext';
 import {useToast} from '@/components/ui/use-toast';
 import {useContext, useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchTypes} from '@/lib/actions/fees/feeMaster/feeMaster/type.actions';
 import {fetchUsers, modifyUserFeeTypes} from '@/lib/actions/users/manageUsers/user.actions';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';

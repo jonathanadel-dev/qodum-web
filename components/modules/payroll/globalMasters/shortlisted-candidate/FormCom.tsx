@@ -5,7 +5,7 @@ import {useToast} from '@/components/ui/use-toast';
 import {useContext, useEffect, useState} from 'react';
 import {applyStaffForAdmission, fetchStaffApplicationsNotUpForAdmission} from '@/lib/actions/payroll/globalMasters/staffApplication.actions';
 import moment from 'moment';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 
 
 

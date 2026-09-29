@@ -2,7 +2,7 @@
 import {useEffect, useState} from 'react';
 import {Input} from '@/components/ui/input';
 import {ChevronsUpDown} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Command, CommandItem, CommandList} from '@/components/ui/command';
 
 

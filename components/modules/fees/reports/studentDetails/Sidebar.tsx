@@ -3,7 +3,7 @@ import Details from './Details';
 import {useState, useEffect, useContext} from 'react';
 import {Switch} from '@/components/ui/switch';
 import {Checkbox} from '@/components/ui/checkbox';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {ChevronRight, ChevronLeft, ChevronDown, Check, X,} from 'lucide-react';
 import {fetchStreams} from '@/lib/actions/admission/globalMasters/stream.actions';
 import {fetchReligions} from '@/lib/actions/admission/globalMasters/religion.actions';

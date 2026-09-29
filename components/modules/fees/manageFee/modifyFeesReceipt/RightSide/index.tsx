@@ -3,7 +3,7 @@ import moment from 'moment';
 import Search from './Search';
 import {useContext, useEffect, useState} from 'react';
 import HeadsList from './HeadsList';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import { AuthContext } from '@/context/AuthContext';
 
 

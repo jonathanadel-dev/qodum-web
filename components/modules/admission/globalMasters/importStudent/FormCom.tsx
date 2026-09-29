@@ -5,7 +5,7 @@ import {Input} from '@/components/ui/input';
 import {AuthContext} from '@/context/AuthContext';
 import {useToast} from '@/components/ui/use-toast';
 import {useContext, useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {fetchWings} from '@/lib/actions/fees/globalMasters/defineClassDetails/wing.actions';
 import {fetchCategoriesNames} from '@/lib/actions/admission/globalMasters/category.actions';

@@ -2,8 +2,8 @@
 import {ChevronDown} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Input} from '@/components/ui/input';
-import LoadingIcon from '@/components/utils/LoadingIcon';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import {fetchProfessionsNames} from '@/lib/actions/payroll/globalMasters/profession.actions';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';

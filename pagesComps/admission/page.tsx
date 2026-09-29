@@ -1,15 +1,15 @@
 'use client';
 // Imports
 import {useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
-import BarCom from '@/components/dashboards/shared/BarCom';
-import DoughnutCom from '@/components/dashboards/shared/DoughnutCom';
-import AdmissionCards from '@/components/dashboards/admissionDashboard/AdmissionCards';
-import NewAdmissionsIn from '@/components/dashboards/admissionDashboard/NewAdmissionsIn';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import BarCom from '@/components/modules/dashboards/shared/BarCom';
+import DoughnutCom from '@/components/modules/dashboards/shared/DoughnutCom';
+import AdmissionCards from '@/components/modules/dashboards/admissionDashboard/AdmissionCards';
+import NewAdmissionsIn from '@/components/modules/dashboards/admissionDashboard/NewAdmissionsIn';
 import {fetchStudentsOnlineAndOfflineRegistrations} from '@/lib/actions/admission/admission/student.actions';
-import ReligionWiseStudentStrength from '@/components/dashboards/admissionDashboard/ReligionWiseStudentStrength';
+import ReligionWiseStudentStrength from '@/components/modules/dashboards/admissionDashboard/ReligionWiseStudentStrength';
 import {newStudentsAndGendersCounts, studentsAndGendersCounts} from '@/lib/actions/admission/admission/admittedStudent.actions';
-import {studentStrengthBarData, studentComparisionBarData, standardStatisticsDoughnutData, transferDoughnutData, categoryDoughnutData} from '@/constants/charts/admissionCharts';
+import {studentStrengthBarData, studentComparisionBarData, standardStatisticsDoughnutData, transferDoughnutData, categoryDoughnutData} from '@/components/modules/dashboards/charts/admissionCharts';
 
 
 

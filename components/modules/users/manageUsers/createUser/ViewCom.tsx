@@ -1,7 +1,7 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import { useUsersList } from '@/lib/hooks/useUserModuleData';
-import { emptyUser } from '@/constants/emptyUser';
+import { useUsersList } from '@/lib/hooks/useData';
+import { emptyUser } from '@/lib/emptyRecords/emptyUser';
 import ListView from '@/components/shared/crud/ListView';
 import { getTabPath } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ export default function ViewCom () {
   const pathname = usePathname();
   const tabPath = getTabPath(pathname);
 
-  const { users, isLoadingUsers: isLoading } = useUsersList();
+  const { data: users, isLoading } = useUsersList();
 
   return (
     <ListView

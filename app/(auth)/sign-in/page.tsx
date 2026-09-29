@@ -5,14 +5,13 @@ import {redirect, useRouter} from 'next/navigation';
 import {Input} from '@/components/ui/input';
 import QodumLogo from '@/public/assets/logo.png';
 import {useToast} from '@/components/ui/use-toast';
-import {useContext, useEffect, useState} from 'react';
+import { useEffect, useState} from 'react';
 import WelcomeImage from '@/public/assets/auth img.svg';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Lock, LogIn, PersonStanding, User} from 'lucide-react';
 import {createUser, loginUser} from '@/lib/actions/users/manageUsers/user.actions';
 import { createAdmissionStates, fetchAdmissionStates } from '@/lib/actions/payroll/globalMasters/admissionStates.actions';
 import { fetchAcademicYears } from '@/lib/actions/accounts/globalMasters/defineSession/defineAcademicYear.actions';
-import { AuthContext } from '@/context/AuthContext';
 
 
 
@@ -27,10 +26,6 @@ const SignIn = () => {
 
     // Router
     const router = useRouter();
-
-
-    // Login user check
-    const {login} = useContext(AuthContext);
 
 
     // Is loading
@@ -117,7 +112,6 @@ const SignIn = () => {
 
         const data = await res.json()
 
-        login(data);
 
         if (!res.ok) {
             if (data.error && typeof data.error === 'object') {

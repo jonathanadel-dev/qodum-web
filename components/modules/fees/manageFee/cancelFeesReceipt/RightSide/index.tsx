@@ -4,7 +4,7 @@ import Search from './Search';
 import {useContext, useEffect, useState} from 'react';
 import PaymentsList from './PaymentsList';
 import {Input} from '@/components/ui/input';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import { AuthContext } from '@/context/AuthContext';
 
 

@@ -10,7 +10,7 @@ import {Check, ChevronDown, X} from 'lucide-react';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useContext, useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchInstallments} from '@/lib/actions/fees/feeMaster/feeMaster/installment.actions';
 import {fetchClasses, modifyClassFeeData} from '@/lib/actions/fees/globalMasters/defineClassDetails/class.actions';
 import {fetchStudentsByClasses} from '@/lib/actions/admission/admission/admittedStudent.actions';

@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import { ChevronsUpDown, ChevronUp, ChevronDown, ChevronRight, X } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import { useFieldState, usePageStateStore } from '@/store/pageStateStore';
 import { useRouter } from 'next/navigation';
 

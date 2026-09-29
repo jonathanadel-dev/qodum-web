@@ -9,7 +9,7 @@ import {useEffect, useState} from 'react';
 import {Form} from '@/components/ui/form';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import StaffRegistration from './forms/StaffRegistration';
 import StaffDocumentDetails from './forms/StaffDocumentDetails';
 import StaffExperienceDetails from './forms/StaffExperienceDetails';

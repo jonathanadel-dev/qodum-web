@@ -8,8 +8,8 @@ import {CalendarIcon, ChevronDown} from 'lucide-react';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

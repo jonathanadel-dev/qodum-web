@@ -1,7 +1,7 @@
 // Imports
 import {Input} from '@/components/ui/input';
 import {ChevronsUpDown} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Command, CommandItem, CommandList} from '@/components/ui/command';
 import {FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
 

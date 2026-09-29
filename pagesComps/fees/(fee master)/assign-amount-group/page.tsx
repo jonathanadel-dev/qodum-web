@@ -1,7 +1,7 @@
 'use client';
 // Imports
 import {useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchGroups} from '@/lib/actions/fees/feeMaster/feeMaster/group.actions';
 import FormCom from '@/components/modules/fees/feeMaster/assignAmountGroup/FormCom';
 import {fetchInstallments} from '@/lib/actions/fees/feeMaster/feeMaster/installment.actions';

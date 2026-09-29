@@ -7,7 +7,7 @@ import {useContext, useEffect, useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {FormControl, Form, FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {fetchClasses} from '@/lib/actions/fees/globalMasters/defineClassDetails/class.actions';
 import {fetchSections} from '@/lib/actions/fees/globalMasters/defineClassDetails/section.actions';

@@ -2,7 +2,7 @@
 // Improts
 import {X} from 'lucide-react';
 import PdfView from './PdfView';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

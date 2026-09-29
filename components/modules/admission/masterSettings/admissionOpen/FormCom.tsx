@@ -5,7 +5,7 @@ import {Checkbox} from '@/components/ui/checkbox';
 import {useToast} from '@/components/ui/use-toast';
 import {Check, ChevronDown, X} from 'lucide-react';
 import {useContext, useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {createAdmissionStates, fetchAdmissionStates} from '@/lib/actions/payroll/globalMasters/admissionStates.actions';
 import {fetchClassesNames, updateClassesAdmissionStates} from '@/lib/actions/fees/globalMasters/defineClassDetails/class.actions';

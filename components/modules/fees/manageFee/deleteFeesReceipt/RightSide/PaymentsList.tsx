@@ -2,7 +2,7 @@
 import moment from 'moment';
 import {ChevronsUpDown} from 'lucide-react';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {deletePaymentByReceiptNo, fetchAllStudentPayments} from '@/lib/actions/fees/manageFee/payment.actions';
 import {fetchStudentByAdmNo, ModifyStudentAffiliatedHeads} from '@/lib/actions/admission/admission/admittedStudent.actions';
 import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogContent} from '@/components/ui/alert-dialog';

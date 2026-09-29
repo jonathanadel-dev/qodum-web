@@ -13,7 +13,7 @@ import {Button} from '@/components/ui/button';
 import {Calendar} from '@/components/ui/calendar';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {ChevronDown, Calendar as CalendarIcon} from 'lucide-react';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {GeneralLedgerValidation} from '@/lib/validations/accounts/accounts/generalLedger.validation';

@@ -4,7 +4,7 @@ import {useEffect, useState} from 'react';
 import {Input} from '@/components/ui/input';
 import {Checkbox} from '@/components/ui/checkbox';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {ChevronDown, ChevronsUpDown, Search} from 'lucide-react';
 import {Command, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';

@@ -2,7 +2,7 @@
 import {Download, Eye, X} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {Checkbox} from '@/components/ui/checkbox';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchStaffDocumentsForAdmission} from '@/lib/actions/payroll/globalMasters/document/staffDocument.actions';
 import Link from 'next/link';
 

@@ -6,7 +6,7 @@ import {Check, ChevronDown, Trash, X} from 'lucide-react';
 import {FormControl, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {fetchSubjects} from '@/lib/actions/admission/globalMasters/subject.actions';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

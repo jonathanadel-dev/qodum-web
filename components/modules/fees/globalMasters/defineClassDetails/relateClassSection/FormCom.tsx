@@ -9,7 +9,7 @@ import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useContext, useEffect, useState} from 'react';
 import {ChevronDown, ChevronsUpDown} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {fetchClass, modifyClassSections} from '@/lib/actions/fees/globalMasters/defineClassDetails/class.actions';

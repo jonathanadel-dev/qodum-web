@@ -1,7 +1,7 @@
 // Improts
 import {AuthContext} from '@/context/AuthContext';
 import {useState, useEffect, useContext} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {ChevronRight, ChevronLeft, ChevronDown} from 'lucide-react';
 import {fetchClasses} from '@/lib/actions/fees/globalMasters/defineClassDetails/class.actions';
 import {meritListReportFilter} from '@/lib/actions/admission/admission/admittedStudent.actions';

@@ -1,7 +1,7 @@
 // Imports
 import {useEffect, useState} from 'react';
 import {Checkbox} from '@/components/ui/checkbox';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchDocumentsForAdmission} from '@/lib/actions/admission/globalMasters/document/document.actions';
 
 

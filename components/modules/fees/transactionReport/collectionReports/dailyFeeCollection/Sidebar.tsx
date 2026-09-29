@@ -11,7 +11,7 @@ import {Button} from '@/components/ui/button';
 import {Calendar} from '@/components/ui/calendar';
 import {Checkbox} from '@/components/ui/checkbox';
 import {zodResolver} from '@hookform/resolvers/zod';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {fetchHeads} from '@/lib/actions/fees/feeMaster/feeMaster/head.actions';
 import {fetchTypes} from '@/lib/actions/fees/feeMaster/feeMaster/type.actions';
@@ -24,7 +24,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {fetchGlobalSchoolDetails} from '@/lib/actions/fees/globalMasters/defineSchool/schoolGlobalDetails.actions';
 import {DailyFeeCollectionValidation} from '@/lib/validations/fees/transactionReport/collectionReports/dailyFeeCollection.validation';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import { AuthContext } from '@/context/AuthContext';
 
 

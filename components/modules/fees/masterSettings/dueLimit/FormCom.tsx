@@ -11,7 +11,7 @@ import {Input} from '@/components/ui/input';
 import {Checkbox} from '@/components/ui/checkbox';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {DueLimitValidation} from '@/lib/validations/fees/masterSettings/dueLimit.validation';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';

@@ -7,7 +7,7 @@ import Receipt from '@/components/modules/admission/admission/admissionFormRegis
 import FormCom from '@/components/modules/admission/admission/admissionFormRegistration/FormCom';
 import ViewCom from '@/components/modules/admission/admission/admissionFormRegistration/ViewCom';
 import EnquiryViewCom from '@/components/modules/admission/admission/admissionFormRegistration/EnquiryViewCom';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

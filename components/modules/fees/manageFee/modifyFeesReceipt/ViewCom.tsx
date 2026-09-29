@@ -2,7 +2,7 @@
 import {format} from 'date-fns';
 import {Button} from '@/components/ui/button';
 import {ChevronsUpDown, X} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchStudentByAdmNo} from '@/lib/actions/admission/admission/admittedStudent.actions';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Command, CommandEmpty, CommandInput, CommandItem, CommandList} from '@/components/ui/command';

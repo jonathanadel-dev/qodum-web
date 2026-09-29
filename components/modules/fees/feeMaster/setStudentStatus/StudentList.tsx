@@ -2,7 +2,7 @@
 import {Switch} from '@/components/ui/switch';
 import {ChevronsUpDown} from 'lucide-react';
 import {Command, CommandEmpty, CommandItem, CommandList} from '@/components/ui/command';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 
 
 

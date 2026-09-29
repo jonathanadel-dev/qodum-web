@@ -1,7 +1,7 @@
 'use client';
 // Imports
 import {useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchLayouts} from '@/lib/actions/admission/masterSettings/layout.actions';
 import FormCom from '@/components/modules/admission/masterSettings/reportLayoutSetting/FormCom';
 import ViewCom from '@/components/modules/admission/masterSettings/reportLayoutSetting/ViewCom';

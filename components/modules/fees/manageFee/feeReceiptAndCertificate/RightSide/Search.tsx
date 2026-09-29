@@ -4,7 +4,7 @@ import {ChevronDown} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {fetchStudentByAdmNo, fetchStudentsByAllData} from '@/lib/actions/admission/admission/admittedStudent.actions';

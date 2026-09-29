@@ -5,7 +5,7 @@ import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Calendar} from '@/components/ui/calendar';
 import {CalendarIcon, ChevronDown} from 'lucide-react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {FormControl, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {fetchBankLedgers} from '@/lib/actions/accounts/accounts/bankLedger.actions';

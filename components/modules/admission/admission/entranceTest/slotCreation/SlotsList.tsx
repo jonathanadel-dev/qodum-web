@@ -4,7 +4,7 @@ import {useState} from 'react';
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Calendar} from '@/components/ui/calendar';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Command, CommandItem, CommandList} from '@/components/ui/command';
 import {CalendarIcon, ChevronsUpDown, Eye, Pencil, Trash2} from 'lucide-react';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';

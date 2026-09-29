@@ -4,7 +4,7 @@ import {useEffect, useState} from 'react';
 import {Input} from '@/components/ui/input';
 import {Switch} from '@/components/ui/switch';
 import {ChevronDown, ChevronsUpDown} from 'lucide-react';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import {fetchHouses} from '@/lib/actions/admission/globalMasters/house.actions';
 import {fetchStreams} from '@/lib/actions/admission/globalMasters/stream.actions';
 import {fetchReligions} from '@/lib/actions/admission/globalMasters/religion.actions';

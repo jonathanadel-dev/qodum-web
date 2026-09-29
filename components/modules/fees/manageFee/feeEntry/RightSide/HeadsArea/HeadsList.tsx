@@ -2,7 +2,7 @@
 import {useEffect} from 'react';
 import {Input} from '@/components/ui/input';
 import {useToast} from '@/components/ui/use-toast';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchClassDueLimit} from '@/lib/actions/fees/masterSettings/dueLimit.actions';
 
 

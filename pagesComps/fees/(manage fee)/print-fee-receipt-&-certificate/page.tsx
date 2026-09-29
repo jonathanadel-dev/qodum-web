@@ -1,7 +1,7 @@
 'use client';
 // Imports
 import {useEffect, useState} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {fetchPayments} from '@/lib/actions/fees/manageFee/payment.actions';
 import FormCom from '@/components/modules/fees/manageFee/feeReceiptAndCertificate/Form';
 import FeeReceipt from '@/components/modules/fees/manageFee/feeEntry/Others/FeeReceipt';

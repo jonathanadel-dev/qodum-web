@@ -3,8 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {Menu} from 'lucide-react';
 import modules from '@/constants/modulesHome';
-import {useContext, useEffect, useState} from 'react';
-import {GlobalStateContext} from '@/context/GlobalStateContext';
+import { useEffect, useState } from 'react';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import { CurrentUser } from '@/lib/auth/session';
 
@@ -14,10 +13,6 @@ import { CurrentUser } from '@/lib/auth/session';
 
 // Main function
 const DropdownMenuCom = ({user}: {user: CurrentUser}) => {
-
-    // Opened pages
-    const {setOpenedPages} = useContext(GlobalStateContext);
-
 
     // Permitted modules
     const [permittedModules, setPermittedModules] = useState<string[]>([]);
@@ -57,7 +52,6 @@ const DropdownMenuCom = ({user}: {user: CurrentUser}) => {
                     <Link
                         key={module.title}
                         href={`/${module.title.toLowerCase().replace(/\s+/g,"-")}`}
-                        onClick={() => setOpenedPages([])}
                         target='_blank'
                     >
                         <DropdownMenuItem className='h-full w-full py-0 px-0 cursor-pointer'>

@@ -5,7 +5,7 @@ import {Label} from '@/components/ui/label';
 import {Switch} from '@/components/ui/switch';
 import {Button} from '@/components/ui/button';
 import {Calendar} from '@/components/ui/calendar';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ChevronRight, ChevronLeft, ChevronDown, CalendarIcon} from 'lucide-react';

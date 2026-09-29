@@ -1,6 +1,6 @@
 // Imports
 import {Checkbox} from '@/components/ui/checkbox';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Check, ChevronDown, ChevronsUpDown, X} from 'lucide-react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 

@@ -1,7 +1,7 @@
 // Imports
 import {ChevronsUpDown} from 'lucide-react';
 import {Checkbox} from '@/components/ui/checkbox';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {FormControl, FormField, FormItem} from '@/components/ui/form';
 import {Command, CommandEmpty, CommandItem, CommandList} from '@/components/ui/command';
 

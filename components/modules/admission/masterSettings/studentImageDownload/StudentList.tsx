@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import {ChevronsUpDown} from 'lucide-react';
 import {Checkbox} from '@/components/ui/checkbox';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {Command, CommandEmpty, CommandItem, CommandList} from '@/components/ui/command';
 
 

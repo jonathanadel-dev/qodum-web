@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { authorize } from '@/lib/auth/authorize'
-import { handleApiError } from '@/lib/api/common/handle-error'
+import { handleApiError } from '@/api/common/handle-error'
 import { CreateUserApiSchema } from '@/lib/validations/users/manageUsers/user.api.validation'
 
 

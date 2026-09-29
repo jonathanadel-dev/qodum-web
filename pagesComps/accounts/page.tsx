@@ -1,11 +1,11 @@
 'use client';
 // Imports
-import BarCom from '@/components/dashboards/shared/BarCom';
-import DoughnutCom from '@/components/dashboards/shared/DoughnutCom';
-import LineCom from '@/components/dashboards/shared/LineCom';
-import AccountCards from '@/components/dashboards/accountsDashboard/AccountCards';
-import TodayVouchers from '@/components/dashboards/accountsDashboard/TodayVouchers';
-import {incomeAndExpenditureLineData, fundFlowBarData, categoryDoughnutData, entryTypeDoughnutData} from '@/constants/charts/accountsCharts';
+import BarCom from '@/components/modules/dashboards/shared/BarCom';
+import DoughnutCom from '@/components/modules/dashboards/shared/DoughnutCom';
+import LineCom from '@/components/modules/dashboards/shared/LineCom';
+import AccountCards from '@/components/modules/dashboards/accountsDashboard/AccountCards';
+import TodayVouchers from '@/components/modules/dashboards/accountsDashboard/TodayVouchers';
+import {incomeAndExpenditureLineData, fundFlowBarData, categoryDoughnutData, entryTypeDoughnutData} from '@/components/modules/dashboards/charts/accountsCharts';
 
 
 

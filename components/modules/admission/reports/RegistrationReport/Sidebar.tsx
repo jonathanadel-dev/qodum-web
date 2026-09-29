@@ -1,7 +1,7 @@
 // Improts
 import {AuthContext} from '@/context/AuthContext';
 import {useState, useEffect, useContext} from 'react';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {ChevronRight, ChevronLeft, ChevronDown, Check, X,} from 'lucide-react';
 import { fetchAcademicYearsNames } from '@/lib/actions/accounts/masterSettings/changeAcademic.actions';
 import { fetchAcademicYears } from '@/lib/actions/accounts/globalMasters/defineSession/defineAcademicYear.actions';
@@ -9,7 +9,7 @@ import { fetchClasses } from '@/lib/actions/fees/globalMasters/defineClassDetail
 import { fetchUsers } from '@/lib/actions/users/manageUsers/user.actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import moment from 'moment';
-import MyDatePicker from '@/components/utils/CustomDatePicker';
+import MyDatePicker from '@/components/shared/CustomDatePicker';
 import { registrationReportFilter } from '@/lib/actions/admission/admission/admittedStudent.actions';
 
 

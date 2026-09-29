@@ -9,7 +9,7 @@ import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
 import {useToast} from '@/components/ui/use-toast';
 import {zodResolver} from '@hookform/resolvers/zod';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {fetchBoards} from '@/lib/actions/fees/globalMasters/defineSchool/board.actions';
 import {fetchClasses} from '@/lib/actions/fees/globalMasters/defineClassDetails/class.actions';

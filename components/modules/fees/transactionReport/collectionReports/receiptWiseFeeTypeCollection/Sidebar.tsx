@@ -9,7 +9,7 @@ import {Button} from '@/components/ui/button';
 import {Calendar} from '@/components/ui/calendar';
 import {Checkbox} from '@/components/ui/checkbox';
 import {zodResolver} from '@hookform/resolvers/zod';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {fetchTypes} from '@/lib/actions/fees/feeMaster/feeMaster/type.actions';
 import {ChevronRight, ChevronLeft, ChevronDown, Check, X,} from 'lucide-react';

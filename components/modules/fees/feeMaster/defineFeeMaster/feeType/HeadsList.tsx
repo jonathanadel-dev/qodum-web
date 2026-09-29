@@ -2,7 +2,7 @@
 import {useEffect, useState} from 'react';
 import {ChevronsUpDown} from 'lucide-react';
 import {Checkbox} from '@/components/ui/checkbox';
-import LoadingIcon from '@/components/utils/LoadingIcon';
+import LoadingIcon from '@/components/shared/LoadingIcon';
 import {FormControl, FormField, FormItem} from '@/components/ui/form';
 import {Command, CommandItem, CommandList} from '@/components/ui/command';
 import {fetchHeads} from '@/lib/actions/fees/feeMaster/feeMaster/head.actions';
