@@ -1,11 +1,10 @@
-// components/modules/users/manageUsers/createUser/FormCom.tsx
 'use client';
 import { usePathname } from 'next/navigation';
 import { Form } from '@/components/ui/form';
 import LoadingIcon from '@/components/shared/LoadingIcon';
 import { useToast } from '@/components/ui/use-toast';
 import { CreateUserValidation, UpdateUserValidation } from '@/lib/validations/users/manageUsers/user.validation';
-import { createUser, deleteUser, modifyUser } from '@/api/users';
+import { createUser, deleteUser, modifyUser, UserPayload } from '@/api/users';
 import { uploadUserImage } from '@/lib/actions/image.actions';
 import { useUsersList, useSchoolsList } from '@/lib/hooks/useData';
 import { useCrudForm } from '@/lib/hooks/useCrudForm';
@@ -110,6 +109,8 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
     //   label: 'Employee',
     //   options: [],
     // },
+    { type: 'number', name: 'age', label: 'Age' },
+    { type: 'number', name: 'salary', label: 'Salary' },
     {
       type: 'multiselect',
       name: 'schools',

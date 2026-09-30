@@ -1,39 +1,16 @@
-import { request, toIds } from './common/utils'
+import { CreateUserValidation } from '@/lib/validations/users/manageUsers/user.validation'
+import { request } from './common/utils'
+import z from 'zod'
 
+export type UserPayload = z.output<typeof CreateUserValidation>
 
-// User payload
-export type UserPayload = {
-    name: string
-    user_name: string
-    password?: string
-    is_reset_password?: boolean
-    designation?: string | null
-    email?: string | null
-    mobile?: string | null
-    profile_picture?: string | null
-    is_active?: boolean
-    enable_otp?: boolean
-    schools?: (string | number)[]
-}
+export const fetchUsers = () => request<any[]>('/api/users')
 
+export const createUser = (values: UserPayload) =>
+    request('/api/users', { method: 'POST', body: JSON.stringify(values) })
 
-// Fetch users
-export const fetchUsers = async () => {
-    const users = await request<any[]>('/api/users')
-    return users.map((u) => ({ ...u, schools: (u.schools ?? []).map(String) }))
-}
+export const modifyUser = ({ id, ...values }: Partial<UserPayload> & { id: number | string }) =>
+    request(`/api/users/${id}`, { method: 'PATCH', body: JSON.stringify(values) })
 
-
-// Create user
-export const createUser = ({ schools, ...values }: UserPayload) =>
-    request('/api/users', { method: 'POST', body: JSON.stringify({ ...values, schools: toIds(schools) }) })
-
-
-// Modify user
-export const modifyUser = ({ id, schools, ...values }: Partial<UserPayload> & { id: number | string }) =>
-    request(`/api/users/${id}`, { method: 'PATCH', body: JSON.stringify({ ...values, schools: toIds(schools) }) })
-
-
-// Delete user
 export const deleteUser = ({ id }: { id: number | string }) =>
     request(`/api/users/${id}`, { method: 'DELETE' })

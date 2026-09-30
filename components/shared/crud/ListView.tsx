@@ -52,6 +52,7 @@ function hydrateRecord(row: any, emptyRecord: Record<string, any>) {
         const def = emptyRecord[key];
         if (raw === undefined || raw === null) record[key] = def;
         else if (typeof def === 'string' && typeof raw !== 'string') record[key] = String(raw);
+        else if (Array.isArray(def) && Array.isArray(raw)) record[key] = raw.map(String);
         else record[key] = raw;
     }
     return record;

@@ -11,6 +11,8 @@ model User {
     is_active         Boolean?
     enable_otp        Boolean?
     is_admin          Boolean?
+    age               Int      @default(-1)
+    salary            Int?
 
     created_at        DateTime @default(now())
     updated_at        DateTime @updatedAt

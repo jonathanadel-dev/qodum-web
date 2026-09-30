@@ -16,10 +16,9 @@ export async function request<T>(url: string, init?: RequestInit): Promise<T> {
     })
     const data = await res.json().catch(() => null)
 
-    if (!res.ok) throw new ApiError(data?.error ?? 'Request failed', res.status)
+    if (!res.ok) {
+        const d = data?.details ? ': ' + Object.entries(data.details).map(([k, v]) => `${k} ${(v as string[]).join(', ')}`).join('; ') : ''
+        throw new ApiError((data?.error ?? 'Request failed') + d, res.status)
+    }
     return data as T
 }
-
-
-// The form's multiselect works in strings, the API in numeric ids
-export const toIds = (data?: (string | number)[]) => data?.map(Number)

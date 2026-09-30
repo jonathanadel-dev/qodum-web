@@ -7,20 +7,20 @@ import { usePathname } from 'next/navigation';
 import { deepEqual, getTabPath } from '@/lib/utils';
 import { useFieldState, usePageStateStore } from '@/store/pageStateStore';
 
-interface UseCrudFormArgs<T> {
+interface UseCrudFormArgs<T, TOut> {
   emptyRecord: T & { id: string };
-  updateSchema: z.ZodType<any>;
-  createSchema?: z.ZodType<any>;
+  updateSchema: z.ZodType<TOut, z.ZodTypeDef, any>;
+  createSchema?: z.ZodType<any, z.ZodTypeDef, any>;
   actions: {
-    create: (values: T) => Promise<any>;
-    modify: (values: T & { id: string }) => Promise<any>;
+    create: (values: TOut) => Promise<any>;
+    modify: (values: TOut & { id: string }) => Promise<any>;
     remove: (id: string) => Promise<any>;
   };
   onDone?: () => void;
   onError?: (error: unknown) => void;
 }
 
-export function useCrudForm<T extends Record<string, any>>({ emptyRecord, updateSchema, createSchema, actions, onDone, onError }: UseCrudFormArgs<T>) {
+export function useCrudForm<T extends Record<string, any>, TOut = any>({ emptyRecord, updateSchema, createSchema, actions, onDone, onError }: UseCrudFormArgs<T, TOut>) {
 
   // Store and path
   const pathname = usePathname();
@@ -39,7 +39,7 @@ export function useCrudForm<T extends Record<string, any>>({ emptyRecord, update
   const mode: 'create' | 'edit' = record.id === '' ? 'create' : 'edit';
   const { id, ...originalValues } = record;
   const form = useForm({
-    resolver: zodResolver(mode === 'create' ? (createSchema ?? updateSchema) : updateSchema),
+    resolver: zodResolver((mode === 'create' ? (createSchema ?? updateSchema) : updateSchema) as z.ZodType<any>),
     defaultValues: draft ?? originalValues
   });
 
@@ -64,12 +64,12 @@ export function useCrudForm<T extends Record<string, any>>({ emptyRecord, update
   };
 
 
-  // Create or modify
+  // Create or modify (values are the Zod output, not the raw form strings)
   const save = form.handleSubmit(async (values) => {
     setIsLoading(true);
     try {
-      if (mode === 'create') await actions.create(values as T);
-      else if (isDirty()) await actions.modify({ ...values, id: record.id } as T & { id: string });
+      if (mode === 'create') await actions.create(values as unknown as TOut);
+      else if (isDirty()) await actions.modify({ ...values, id: record.id } as unknown as TOut & { id: string });
       onDone?.();
       reset();
     } catch (error) {

@@ -3,7 +3,9 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { authorize } from '@/lib/auth/authorize'
 import { handleApiError } from '@/api/common/handle-error'
-import { UpdateUserApiSchema } from '@/lib/validations/users/manageUsers/user.api.validation'
+import { UpdateUserValidation } from '@/lib/validations/users/manageUsers/user.validation'
+import { parseId } from '@/lib/utils'
+import { parseBody } from '@/api/common/parse-body'
 
 
 const MODULE = 'users'
@@ -12,11 +14,6 @@ const PAGE = 'create-user'
 
 // Param type
 type Context = { params: Promise<{ id: string }> }
-
-const parseId = (raw: string) => {
-    const id = Number(raw)
-    return Number.isInteger(id) ? id : null
-}
 
 // A non-admin must never modify or delete an admin account
 async function checkTarget(id: number, callerIsAdmin: boolean | null) {
@@ -41,13 +38,9 @@ export async function PATCH(request: NextRequest, { params }: Context) {
 
 
     // Data validation
-    const parsed = UpdateUserApiSchema.safeParse(await request.json().catch(() => null))
-    if (!parsed.success) {
-        return NextResponse.json(
-            { error: 'Invalid data', details: parsed.error.flatten().fieldErrors },
-            { status: 400 }
-        )
-    }
+    const body = await parseBody(UpdateUserValidation.partial(), request)
+    if ('response' in body) return body.response
+    const { password, schools, ...data } = body.data
 
 
     // Is user changing an admin's data?
@@ -56,7 +49,6 @@ export async function PATCH(request: NextRequest, { params }: Context) {
 
 
     // Updating user
-    const { password, schools, ...data } = parsed.data
     try {
         const user = await prisma.user.update({
             where: { id },

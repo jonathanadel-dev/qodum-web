@@ -197,3 +197,95 @@ Enforcement uses API routes, not server actions, because routes can return 401/4
 **Verification:** The catalog seeds, and the seed script now reports the module and sub-module of a malformed tree entry instead of a generic Prisma error. An admin can sign in, pass `proxy.ts`, and see the modules grid, sidebar, and Create User buttons.
 
 **Impact:** Closes the "action-level checks deferred" item in `authentication.md`, once the routes exist. **Not done yet:** the `app/api/users/*` routes and `authorize()` (designed, not built); ~80 legacy components still read `sub_menu` and the nested permission shape; carry-forward of grants between sessions.
+
+---
+
+## Numeric data through the form lifecycle: one schema, two conversion points
+
+**Found:** The shared CRUD layer moved records between the database and
+the form, but had no defined rule for numbers. The User model has almost
+no integer surface (`mobile` is a string), so the gap never showed up on
+Create User. Tracing the flow for other models found:
+
+- `hydrateRecord` converts numbers to strings for the form, but nothing
+  converted them back. Only `id` (`parseId`) and `schools` (`toIds`) had
+  hand-written reverse conversions.
+- The client and server each had their own Zod schema for a user, and they
+  had already drifted (the form required a numeric `mobile`; the server
+  accepted any string).
+- The old schema pattern `.pipe(z.coerce.number())` turns an empty
+  optional field into `0`, since `Number('')` is `0`.
+- `toDbNumber` existed twice and was never called.
+
+**Root cause:** HTML inputs always emit strings, and the database wants
+real numbers, so the type has to change twice on every round trip. With
+no rule for where, each field got its own ad-hoc conversion, or none.
+
+**Fix:** Each direction has exactly one conversion point.
+
+```
+READ   Postgres (Int) → GET /api/users (JSON, numbers) → SWR cache
+       → ListView row select → hydrateRecord (number → string) → Zustand record
+       → useCrudForm defaultValues → <input> (strings)
+
+WRITE  <input> (strings) → react-hook-form → shared Zod schema
+       (string → number, '' → null) → save() → api/users.ts
+       → route: parseBody(same schema) → Prisma → Postgres
+```
+
+- **DB → form:** `hydrateRecord` only. A string default in `emptyRecord`
+  means a string field, so numbers are stringified and `null` becomes
+  `''`. Arrays of ids become string arrays. Number fields must default to
+  `''`, never `0`, or `isDirty` compares `5` against `"5"`.
+- **Form → DB:** the Zod schema only, using `zInt` and `zFloat`
+  (`lib/validations/shared/number.ts`). They accept a string (form) or a
+  number (JSON), reject anything that isn't a clean number (no `1e3`,
+  `0x10`, `1.5` for an int, or values above the Postgres Int range),
+  and output a real number. `.optional()` turns an empty value into
+  `null`, so a PATCH can clear a column; `.required()` rejects it.
+- **One schema:** `user.validation.ts` is the only user schema. The client
+  validates with it through `zodResolver`, and the routes validate with it
+  through a shared `parseBody()` helper. PATCH uses
+  `UpdateUserValidation.partial()`, so an omitted field means "leave it
+  unchanged". The separate API schema, `toIds`, and the `.map(String)` in
+  `fetchUsers` were deleted.
+- **Numeric strings:** values that are digits but not numbers (phone
+  numbers, codes) use `zNumericString`, which is digits-only and stays a
+  string end to end.
+- **Types:** `useCrudForm` takes a second type parameter inferred from the
+  update schema, so `create` and `modify` are typed with the Zod *output*
+  rather than the form-side `emptyRecord` type. `UserPayload` is derived
+  from the schema instead of written by hand.
+- Removed a phantom `employee` field from the form schema and
+  `emptyUser`. It isn't in the Prisma model and would have reached
+  `prisma.user.create` as an unknown argument.
+
+**Verification:** Tested end to end on Create User with two test fields
+added to the `User` model: `age` (required `Int`, default `-1`) and
+`salary` (optional `Int`). Create and edit both work, and
+`npx tsc --noEmit` reports no errors in the files touched. Errors that
+remain in `manageUsers/feeTypeAssignToUser` and
+`manageUsers/userPermission` come from the legacy `AuthContext` import,
+not from this work. A stale `"ignoreDeprecations": "6.0"` in
+`tsconfig.json` (TypeScript is on 5) had been aborting `tsc` before it
+checked any file, so type errors across the project had not been
+surfacing.
+
+**Impact:** Every remaining module inherits this: define one schema, use
+`zInt`/`zFloat`/`zNumericString` for numeric fields, default number fields
+to `''` in `emptyRecord`, and use `parseBody()` in the routes.
+
+**Not done yet:**
+- Only `Int` and numeric strings were exercised. `Float`/`Decimal` fields
+  (money columns should become `Decimal`, which serializes to a string in
+  JSON), single nullable foreign-key selects, dates, and booleans on other
+  pages haven't been tested through this path.
+- `strictNullChecks` is off, so Zod types every object key as optional and
+  drops `null` from unions. This is why `parseBody()` casts its result to
+  `Required<>`. TypeScript won't catch a missing required field on these
+  pages; Zod enforces it at runtime. Enabling the flag project-wide is a
+  separate task.
+- Existing users get `age = -1` from the column default, and the form
+  rejects `-1`, so each old user needs a real age before it can be saved.
+- `request()` still throws only `data.error`, so a rejected save shows a
+  generic "Invalid data" toast and the field errors in `details` are lost.

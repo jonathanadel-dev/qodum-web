@@ -6,10 +6,12 @@ export const emptyUser = {
   is_reset_password: false,
   designation: '',
   email: '',
-  employee: '',
+  // employee: '',
   mobile: '',
   profile_picture: '',
   schools: [],
   is_active: false,
   enable_otp: false,
+  age: '',
+  salary: '',
 };

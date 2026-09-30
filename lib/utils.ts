@@ -20,13 +20,6 @@ export const deepEqual:any = (x:any, y:any) => {
 };
 
 
-// Transforming numbers
-export const toDbNumber = (v: string | undefined): number | undefined =>
-  v === undefined || v === '' ? undefined : Number(v);
-export const fromDbNumber = (v: number | undefined | null): string =>
-  v === undefined || v === null ? '' : String(v);
-
-
 // Resolve permission key
 export const resolvePermissionKey = (pathname: string) => {
   const [moduleSlug, leafSlug] = pathname.split('/').filter(Boolean);
@@ -59,11 +52,6 @@ export const getTabPath = (pathname: string) => {
 };
 
 
-// Slugify
-export const slugify = (label: string) =>
-  label.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-
 // Get module root
 export const getModuleRoot = (pathname: string) => {
   const [moduleSlug] = pathname.split('/').filter(Boolean);
@@ -76,3 +64,10 @@ export const getModuleSlug = (pathname: string) => {
   const [moduleSlug] = pathname.split('/').filter(Boolean);
   return moduleSlug ?? '';
 };
+
+
+// Parsing API's ID param
+export const parseId = (raw: string) => {
+  const id = Number(raw)
+  return Number.isInteger(id) ? id : null
+}
