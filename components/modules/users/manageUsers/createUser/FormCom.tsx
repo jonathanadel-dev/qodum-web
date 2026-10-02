@@ -6,17 +6,17 @@ import { useToast } from '@/components/ui/use-toast';
 import { CreateUserValidation, UpdateUserValidation } from '@/lib/validations/users/manageUsers/user.validation';
 import { createUser, deleteUser, modifyUser, UserPayload } from '@/api/users';
 import { uploadUserImage } from '@/lib/actions/image.actions';
-import { useUsersList, useSchoolsList } from '@/lib/hooks/useData';
+import { useUsersList } from '@/lib/hooks/useModuleData/useUsersData';
 import { useCrudForm } from '@/lib/hooks/useCrudForm';
 import { usePermission } from '@/lib/hooks/usePermission';
-import { useFieldState } from '@/store/pageStateStore';
-import { emptyUser } from '@/lib/emptyRecords/emptyUser';
+import { emptyUser } from '@/lib/emptyRecords/users/emptyUser';
 import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
 import CrudButtons from '@/components/shared/crud/CrudButtons';
 import { CurrentUser } from '@/lib/auth/session';
 import PrintButton from '@/components/shared/crud/PrintButton';
 import moment from 'moment';
 import { getTabPath } from '@/lib/utils';
+import { useSchoolsOptions } from '@/lib/hooks/useModuleData/useFeesData';
 
 export default function FormCom ({ user }: { user: CurrentUser | null }) {
 
@@ -28,7 +28,7 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
 
   // Data fetching
   const { data: users, mutate: mutateUsers } = useUsersList();
-  const { data: schools } = useSchoolsList();
+  const { data: schools } = useSchoolsOptions();
 
 
   // Permissions

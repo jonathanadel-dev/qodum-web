@@ -7,17 +7,22 @@ type Action = 'add' | 'modify' | 'delete' | 'print' | 'read_only' | 'any'
 type AuthResult = { user: CurrentUser } | { response: NextResponse }
 
 
+// Authenticate
+export async function authenticate(): Promise<AuthResult> {
+    const user = await getCurrentUser()
+    if (!user) return { response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
+    if (user.is_active === false) return { response: NextResponse.json({ error: 'Account is inactive' }, { status: 403 }) }
+    return { user }
+}
+
+
 // Authorize
 export async function authorize( module_name: string, page_name: string, action: Action ): Promise<AuthResult> {
 
     // Verifying the user exists and is active
-    const user = await getCurrentUser()
-    if (!user) {
-        return { response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
-    }
-    if (user.is_active === false) {
-        return { response: NextResponse.json({ error: 'Account is inactive' }, { status: 403 }) }
-    }
+    const base = await authenticate()
+    if ('response' in base) return base
+    const user = base.user
 
 
     // Check if the user has the right permissions

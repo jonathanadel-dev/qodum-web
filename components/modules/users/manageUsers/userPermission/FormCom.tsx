@@ -1,208 +1,168 @@
+// components/modules/users/manageUsers/userPermission/FormCom.tsx
 'use client';
 // Imports
-import {ChevronDown} from 'lucide-react';
-import {useContext, useEffect, useState} from 'react';
-import {useToast} from '@/components/ui/use-toast';
+import { useMemo } from 'react';
+import { Form } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 import LoadingIcon from '@/components/shared/LoadingIcon';
-import {fetchUsers, modifyUserPermissions} from '@/lib/actions/users/manageUsers/user.actions';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
+import { saveUserPermissions, UserPermissionRow } from '@/api/users';
+import { useUsersList, useUserPermissions } from '@/lib/hooks/useModuleData/useUsersData';
+import { useCrudForm } from '@/lib/hooks/useCrudForm';
+import { usePermission } from '@/lib/hooks/usePermission';
+import { useFieldState } from '@/store/pageStateStore';
+import { emptyUserPermission } from '@/lib/emptyRecords/users/emptyUserPermission';
+import { UserPermissionValidation } from '@/lib/validations/users/manageUsers/userPermission.validation';
+import { permissionModules } from '@/constants/permissionsTree';
+import { humanize } from '@/lib/utils';
+import { CurrentUser } from '@/lib/auth/session';
 import PermissionsList from './PermissionsList';
-import { AuthContext } from '@/context/AuthContext';
 
 
+// Types and helpers
+type Flag = 'add' | 'modify' | 'delete' | 'print' | 'read_only';
+type Flags = Record<Flag, boolean>;
+type Edits = Record<string, Record<number, Flags>>;   // userId -> permission_item_id -> flags
 
+const FLAGS: Flag[] = ['add', 'modify', 'delete', 'print', 'read_only'];
+const EMPTY_EDITS: Edits = {};
+const EMPTY_USER_EDITS: Record<number, Flags> = {};
+const MODULES = permissionModules.map((m) => ({ value: m.moduleName, label: humanize(m.moduleName) }));
+const flagsOf = (r: UserPermissionRow): Flags => ({ add: r.add, modify: r.modify, delete: r.delete, print: r.print, read_only: r.read_only });
 
 
 // Main function
-const FormCom = () => {
+const FormCom = ({ user }: { user: CurrentUser | null }) => {
 
-    // User
-    const {user} = useContext(AuthContext);
-
-
-    // Permissions
-    const [permissions, setPermissions] = useState({
-        add:false,
-        modify:false,
-        delete:false,
-        print:false,
-        read_only:false
-    });
+  const { toast } = useToast();
 
 
-    // Toast
-    const {toast} = useToast();
+  // Permissions
+  const permissions = usePermission(user);
 
 
-    // Is loading
-    const [isLoading, setIsLoading] = useState(false);
+  // CRUD form (only user + module are form fields; the checkbox edits live in the store)
+  const { form, isLoading, save, cancel, tabPath } = useCrudForm({
+    emptyRecord: emptyUserPermission,
+    updateSchema: UserPermissionValidation,
+    actions: {
+      create: async (values) => {
+        if (changed.length === 0) throw new Error('No changes to save');
+        await saveUserPermissions({ id: values.user_id, permissions: changed });
+        toast({ title: 'User permissions updated!' });
+      },
+      modify: async () => {},   // unused: this page is always in create mode
+      remove: async () => {},   // unused
+    },
+    onDone: () => {
+      mutatePermissions();
+    },
+    onError: (error) => {
+      toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
+    },
+  });
+  const userId = form.watch('user_id');
+  const moduleName = form.watch('module');
 
 
-    // Errors
-    const [errors, setErrors] = useState({
-        user:'',
-        module:''
-    });
+  // Data fetching
+  const { data: allUsers, isLoading: usersLoading } = useUsersList();
+  const users = useMemo(() => allUsers.filter((u: any) => !u.is_admin), [allUsers]);
+  const { data: serverRows, mutate: mutatePermissions, isLoading: permissionsLoading } = useUserPermissions(userId);
 
 
-    // Users
-    const [users, setUsers] = useState<any>([{}]);
+  // Pending edits (store)
+  const [allEdits, setAllEdits] = useFieldState<Edits>('edits', EMPTY_EDITS, tabPath);
+  const edits = allEdits[userId] ?? EMPTY_USER_EDITS;
 
 
-    // Modules
-    const modules = ['Admission', 'Fees', 'Attendance', 'Payroll', 'Marks Entry', 'Examinations', 'Time Table', 'Accounts', 'Stocks', 'Library', 'Users', 'Qodum Care'];
+  // Rows = server rows + pending edits
+  const rows = useMemo(
+    () => serverRows.map((r) => (edits[r.permission_item_id] ? { ...r, ...edits[r.permission_item_id] } : r)),
+    [serverRows, edits]
+  );
+  const visibleRows = rows.filter((r) => r.module_name === moduleName);
+  const changed = rows.filter((r, i) => FLAGS.some((f) => r[f] !== serverRows[i][f]));
 
 
-    // Selected user
-    const [selectedUser, setSelctedUser] = useState('');
+  // Toggles
+  const setUserEdits = (next: Record<number, Flags>) => setAllEdits({ ...allEdits, [userId]: next });
+
+  const toggle = (itemId: number, flag: Flag) => {
+    const row = rows.find((r) => r.permission_item_id === itemId)!;
+    setUserEdits({ ...edits, [itemId]: { ...flagsOf(row), [flag]: !row[flag] } });
+  };
+
+  const toggleAll = (flag: Flag) => {
+    const next = !visibleRows.every((r) => r[flag]);
+    const merged = { ...edits };
+    visibleRows.forEach((r) => { merged[r.permission_item_id] = { ...flagsOf(r), [flag]: next }; });
+    setUserEdits(merged);
+  };
 
 
-    // Selected module
-    const [selectedModule, setSelectedModule] = useState('');
+  // Fields
+  const fields: FieldConfig[] = [
+    {
+      type: 'select',
+      name: 'user_id',
+      label: 'User',
+      loading: usersLoading,
+      options: users.map((u: any) => ({ value: String(u.id), label: u.name })),
+    },
+    { type: 'select', name: 'module', label: 'Module', options: MODULES },
+  ];
 
+  return (
+    <div className='w-full flex flex-col items-center gap-8 mb-10'>
 
-    // Current user
-    const [currentUser, setCurrentUser] = useState<any>({});
+      <div className='w-full max-w-2xl mx-auto rounded-[8px] border border-[#E8E8E8] bg-white overflow-hidden'>
+        <h2 className='w-full py-3 text-sm text-center font-bold rounded-t-lg bg-[#e7f0f7] text-main-color border-b border-[#F0F0F0]'>
+          User Permission
+        </h2>
+        <Form {...form}>
+          <form onSubmit={save} className='flex flex-col gap-6 p-5 sm:p-8'>
 
-
-    // Submit handler
-    const submitHandler = async () => {
-
-        // Setting is loading to true
-        setIsLoading(true);
-
-
-        // Validate user and module
-        if(selectedUser === '' || selectedModule === ''){
-            setErrors({
-                user:selectedUser === '' ? 'Please select a user' : '',
-                module:selectedModule === '' ? 'Please select a module' : ''
-            });
-            setIsLoading(false);
-            return;
-        };
-
-
-        // Updaing user's permissions
-        await modifyUserPermissions({id:currentUser?._id, permissions:currentUser.permissions});
-
-
-        // Reseting
-        toast({title:'User permissions updated!'});
-
-
-        // Setting is loading to false
-        setIsLoading(false);
-
-    };
-
-
-    // Use effect
-    useEffect(() => {
-        const fetcher = async () => {
-            const usersRes = await fetchUsers();
-            setUsers(usersRes.filter((u:any) => !u.is_admin));
-        };
-        fetcher();
-    }, []);
-    useEffect(() => {
-        setIsLoading(true);
-        setCurrentUser(users.find((u:any) => u.name === selectedUser));
-        setIsLoading(false);
-    }, [selectedUser]);
-    useEffect(() => {
-        const grantedPermissions = user?.permissions?.find((p:any) => p.name === 'Users')?.permissions?.find((pp:any) => pp.sub_menu === 'User Permission');
-        setPermissions(grantedPermissions);
-    }, [user]);
-
-    return (
-        <div className='w-full flex flex-col items-center justify-center gap-10'>
-
-            <div className='w-[50%] flex flex-row items-center gap-4'>
-
-                {/* User */}
-                <div className='w-full flex flex-col items-start justify-center'>
-                    <Select
-                        value={selectedUser}
-                        onValueChange={(v:any) => {
-                            setSelctedUser(v);
-                            setErrors({...errors, user:''});
-                        }}
-                        disabled={!permissions.read_only}
-                    >
-                        <SelectTrigger className='h-8 w-full flex flex-row items-center text-xs pl-2 rounded-none bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4]'>
-                            <SelectValue placeholder='Select User'/>
-                            <ChevronDown className='h-4 w-4 opacity-50'/>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {users.length < 1 ? (
-                                <p>No users</p>
-                            ) : !users[0]?.name ? (
-                                <LoadingIcon />
-                            ) : users.map((item:any) => (
-                                <SelectItem value={item?.name} key={item._id}>{item?.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {errors.user && <span className='text-[11px] text-red-500'>{errors.user}</span>}
-                </div>
-
-
-                {/* Module */}
-                <div className='w-full flex flex-col items-start justify-center'>
-                    <Select
-                        value={selectedModule}
-                        onValueChange={(v:any) => {
-                            setSelectedModule(v);
-                            setErrors({...errors, module:''});
-                        }}
-                        disabled={!permissions.read_only}
-                    >
-                        <SelectTrigger className='h-8 w-full flex flex-row items-center text-xs pl-2 rounded-none bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4]'>
-                            <SelectValue placeholder='Select Module'/>
-                            <ChevronDown className='h-4 w-4 opacity-50'/>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {modules.map((item:any) => (
-                                <SelectItem value={item} key={item}>{item}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {errors.module && <span className='text-[11px] text-red-500'>{errors.module}</span>}
-                </div>
-
-
-                {/* Buttons */}
-                {permissions.modify && isLoading ? (
-                    <LoadingIcon />
-                ) : (
-                    <span
-                        onClick={submitHandler}
-                        className='w-[200px] flex items-center justify-center h-8 text-xs text-white bg-gradient-to-r from-[#3D67B0] to-[#4CA7DE] transition border-[1px] rounded-full border-white cursor-pointer
-                                hover:border-main-color hover:from-[#e7f0f7] hover:to-[#e7f0f7] hover:text-main-color'
-                    >
-                        Update
-                    </span>
-                )}
-
+            {/* Inputs */}
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5'>
+              {fields.map((f) => <DynamicField key={f.name} field={f} control={form.control} />)}
             </div>
 
+            {/* Buttons */}
+            <div className='flex justify-center pt-5 border-t border-[#F0F0F0]'>
+              {isLoading ? <LoadingIcon /> : (
+                <div className='flex flex-row items-center justify-center gap-2'>
+                  {permissions.modify && (
+                    <Button type='submit' className='px-[8px] h-8 cursor-pointer text-xs text-white bg-gradient-to-r from-[#3D67B0] to-[#4CA7DE] transition border-[1px] rounded-full border-white hover:border-main-color hover:from-[#e7f0f7] hover:to-[#e7f0f7] hover:text-main-color sm:text-[16px] sm:px-4'>
+                      Save
+                    </Button>
+                  )}
+                  <span
+                    onClick={cancel}
+                    className='flex items-center px-[8px] h-8 text-xs text-black bg-gradient-to-r from-[#C7C8CA] to-[#EAEDF0] rounded-full transition border-[1px] border-white cursor-pointer hover:border-[#a3a3a3] hover:from-[#c8c9cb26] hover:to-[#c8c9cb26] hover:text-hash-color sm:text-[16px] sm:px-4'
+                  >
+                    Cancel
+                  </span>
+                </div>
+              )}
+            </div>
 
-            {/* Permissions list */}
-            {selectedUser !== '' && selectedModule !== '' && (
-                <PermissionsList
-                    currentUser={currentUser}
-                    selectedModule={selectedModule}
-                    setCurrentUser={setCurrentUser}
-                />
-            )}
+          </form>
+        </Form>
+      </div>
 
-        </div>
-    );
+
+      {/* Permissions list */}
+      {userId && moduleName && (
+        permissionsLoading ? <LoadingIcon /> : (
+          <PermissionsList rows={visibleRows} onToggle={toggle} onToggleAll={toggleAll} />
+        )
+      )}
+
+    </div>
+  );
 };
-
-
-
 
 
 // Export

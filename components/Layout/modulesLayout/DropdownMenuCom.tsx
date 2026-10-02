@@ -1,42 +1,21 @@
+// components/Layout/modulesLayout/DropdownMenuCom.tsx
 // Imports
 import Link from 'next/link';
 import Image from 'next/image';
 import {Menu} from 'lucide-react';
-import modules from '@/constants/modulesHome';
-import { useEffect, useState } from 'react';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import { CurrentUser } from '@/lib/auth/session';
+import { toSlug, usePermittedModules } from '@/lib/hooks/usePermittedModules';
 
 
 
 
 
 // Main function
-const DropdownMenuCom = ({user}: {user: CurrentUser}) => {
+const DropdownMenuCom = ({user}: {user: CurrentUser | null}) => {
 
     // Permitted modules
-    const [permittedModules, setPermittedModules] = useState<string[]>([]);
-
-
-    // Use effect
-    useEffect(() => {
-
-        if (user?.is_admin) {
-            setPermittedModules(modules.map((m: any) => m.title));
-            return;
-        }
-
-        const granted = new Set<string>();
-
-        user?.permissions?.forEach((p) => {
-            if (p.add || p.modify || p.delete || p.print || p.read_only) {
-                granted.add(p.module_name);
-            }
-        });
-
-        setPermittedModules(Array.from(granted));
-
-    }, [user]);
+    const permittedModules = usePermittedModules(user);
 
     return (
         <DropdownMenu>
@@ -48,10 +27,10 @@ const DropdownMenuCom = ({user}: {user: CurrentUser}) => {
             <DropdownMenuContent
                 className='bg-white rounded-[8px] w-[200px]'
             >
-                {modules.filter((module:any) => permittedModules?.includes(module.title)).map((module:any) => (
+                {permittedModules.map((module:any) => (
                     <Link
                         key={module.title}
-                        href={`/${module.title.toLowerCase().replace(/\s+/g,"-")}`}
+                        href={`/${toSlug(module.title)}`}
                         target='_blank'
                     >
                         <DropdownMenuItem className='h-full w-full py-0 px-0 cursor-pointer'>
