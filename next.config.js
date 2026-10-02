@@ -15,6 +15,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'qodum.s3.amazonaws.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
         hostname: 'static.vecteezy.com',
         port: '',
       },

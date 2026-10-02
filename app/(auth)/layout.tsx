@@ -1,5 +1,5 @@
 // Improts
-import '../globals.css';
+import '../styles/globals.css';
 import {ABeeZee} from 'next/font/google';
 import {Toaster} from '@/components/ui/toaster';
 

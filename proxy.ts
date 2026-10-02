@@ -57,5 +57,19 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/', '/sign-in', '/admission', '/fees', '/attendance', '/payroll', '/marks-entry', '/examinations', '/time-table', '/accounts', '/stocks', '/library', '/users', '/qodum-care'],
+    matcher: [
+        '/', '/sign-in',
+        '/admission/:path*',
+        '/fees/:path*',
+        '/attendance/:path*',
+        '/payroll/:path*',
+        '/marks-entry/:path*',
+        '/examinations/:path*',
+        '/time-table/:path*',
+        '/accounts/:path*',
+        '/stocks/:path*',
+        '/library/:path*',
+        '/users/:path*',
+        '/qodum-care/:path*'
+    ],
 }

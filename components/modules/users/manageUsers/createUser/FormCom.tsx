@@ -23,8 +23,6 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
   // Path and store
   const pathname = usePathname();
   const tabPath = getTabPath(pathname);
-  const [file, setFile] = useFieldState<any>('file', null, tabPath);
-  const [imgSrc, setImgSrc] = useFieldState('imgSrc', '', tabPath);
   const { toast } = useToast();
 
 
@@ -38,20 +36,15 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
 
 
   // File
-  const resolveProfilePicture = async (name: string, existing: string) => {
-    if (!file) return existing;
+  const resolveProfilePicture = async (name: string, current: string) => {
+    if (!current.startsWith('data:')) return current;
+    const blob = await (await fetch(current)).blob();
     const randomNumber = Math.floor(Math.random() * 1000000) + 1;
     const key = `${name.toLowerCase().replace(/\s+/g, '-')}-${randomNumber}`;
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', blob);
     await uploadUserImage({ data: formData, name: key });
     return `https://qodum.s3.amazonaws.com/users/${key}`;
-  };
-  const handleOnChange = (e: any) => {
-    setFile(e.target.files[0]);
-    const reader = new FileReader();
-    reader.onload = (ev) => setImgSrc(ev.target?.result as string);
-    reader.readAsDataURL(e.target.files[0]);
   };
 
 
@@ -65,12 +58,12 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
         if (users.map((r: any) => r.user_name).includes(values.user_name)) {
           throw new Error('User already exists');
         }
-        const profile_picture = await resolveProfilePicture(values.name, '');
+        const profile_picture = await resolveProfilePicture(values.name, values.profile_picture);
         await createUser({ ...values, profile_picture });
         toast({ title: 'Added Successfully!' });
       },
       modify: async (values) => {
-        const profile_picture = await resolveProfilePicture(values.name, record.profile_picture);
+        const profile_picture = await resolveProfilePicture(values.name, values.profile_picture);
         await modifyUser({
           ...values,
           profile_picture,
@@ -85,13 +78,22 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
     },
     onDone: () => {
       mutateUsers();
-      setFile(null);
-      setImgSrc('');
     },
     onError: (error) => {
       toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
     },
   });
+
+
+  // On change
+  const picture = form.watch('profile_picture');
+  const handleOnChange = (e: any) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => form.setValue('profile_picture', ev.target?.result as string);
+    reader.readAsDataURL(f);
+  };
 
 
   // Fields
@@ -140,8 +142,7 @@ export default function FormCom ({ user }: { user: CurrentUser | null }) {
             <p className='text-[11px] font-medium text-[#726E71]'>Profile Picture</p>
             <div className='w-24 h-24 flex items-center justify-center bg-[#ccc] rounded-md cursor-pointer transition hover:opacity-90'>
               <label htmlFor='image' className='flex items-center justify-center h-full w-full cursor-pointer text-xs font-semibold'>
-                {imgSrc ? <img alt="User's image" src={imgSrc} className='w-full h-full object-cover rounded-md' />
-                  : record.profile_picture ? <img alt="User's image" src={record.profile_picture} className='w-full h-full object-cover rounded-md' />
+                {picture ? <img alt="User's image" src={picture} className='w-full h-full object-cover rounded-md' />
                   : <p className='text-[10px] text-center px-2'>Select Image</p>}
               </label>
               <input type='file' accept='image/*' name='image' id='image' className='hidden' onChange={handleOnChange} />

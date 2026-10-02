@@ -96,10 +96,10 @@ const HomeTopbar = ({isSidebarOpened, setIsSidebarOpened, user}:any) => {
 
 
                     {/* Profile Picture */}
-                    {user?.profilePicture ? (
+                    {user?.profile_picture ? (
 
                         <img
-                            src={user?.profilePicture}
+                            src={user?.profile_picture}
                             alt='User profile picture'
                             className='h-13 w-13 rounded-full border border-[#DCE5EE] object-cover'
                         />
