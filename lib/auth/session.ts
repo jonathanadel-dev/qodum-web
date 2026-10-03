@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from './jwt'
 import { JWTPayload } from 'jose'
+import { getActiveSession } from './activeSession'
 
 const COOKIE_NAME = 'qodum_session'
 
@@ -54,7 +55,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         const payload = await getUserFromCookie()
         if (!payload || typeof payload.user_id !== 'number') return null
 
-        const activeSession = await prisma.academicYear.findFirst({ where: { is_active: true } })
+        const { academic_year: activeSession } = await getActiveSession()
 
         const user = await prisma.user.findUnique({
             where: { id: payload.user_id },

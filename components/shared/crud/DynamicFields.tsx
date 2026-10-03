@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 // Types
 export type FieldConfig =
-  | { type: 'text' | 'password' | 'number'; name: string; label: string; span?: 'full' }
+  | { type: 'text' | 'password' | 'number' | 'date'; name: string; label: string; span?: 'full' }
   | { type: 'select'; name: string; label: string; options: { value: string; label: string }[]; loading?: boolean; span?: 'full' }
   | { type: 'multiselect'; name: string; label: string; options: { value: string; label: string }[]; loading?: boolean; selectAll?: boolean; span?: 'full' }
   | { type: 'switch'; name: string; label: string };

@@ -5,8 +5,9 @@ import Sidebar from './Sidebar';
 import ModulesGrid from './ModulesGrid';
 import Footer from '../Footer';
 import { CurrentUser } from '@/lib/auth/session';
+import { ActiveSession } from '@/lib/auth/activeSession';
 
-export default function HomePage({ user }: {user: CurrentUser | null}) {
+export default function HomePage({ user, session }: {user: CurrentUser | null, session: ActiveSession | null}) {
 
     return (
         <main className='min-h-screen bg-[#F6F8FB] px-3 py-3 md:px-5 lg:px-6'>
@@ -86,7 +87,7 @@ export default function HomePage({ user }: {user: CurrentUser | null}) {
                         <ModulesGrid user={user} />
                     </section>
 
-                    <Footer />
+                    <Footer session={session} />
 
                 </div>
             </div>

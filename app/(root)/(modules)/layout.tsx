@@ -4,11 +4,13 @@ import Header from "@/components/layout/modulesLayout/Header";
 import Sidebar from "@/components/layout/modulesLayout/Sidebar";
 import Tabs from "@/components/layout/modulesLayout/Tabs";
 import TabSync from "@/components/layout/modulesLayout/TabSync";
+import { getActiveSession } from "@/lib/auth/activeSession";
 import { getCurrentUser } from "@/lib/auth/session";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    const user = await getCurrentUser();
 
+    const [user, session] = await Promise.all([getCurrentUser(), getActiveSession()]);
+    
     return (
         <main className='min-h-screen'>
             <div className='relative mx-auto flex'>                
@@ -17,7 +19,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </aside>
 
                 <div className='min-w-0 flex-1 flex flex-col'>
-                    <Header user={user} />
+                    <Header user={user} session={session} />
 
                     <main className='flex-1 mt-4'>
                         <TabSync />
@@ -32,7 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         </div>
                     </main>
                     
-                    <Footer />
+                    <Footer session={session} />
                 </div>
                 
             </div>

@@ -1,4 +1,3 @@
-// app/api/users/[id]/permissions/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import z from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -6,6 +5,7 @@ import { authorize } from '@/lib/auth/authorize'
 import { handleApiError } from '@/api/common/handle-error'
 import { parseBody } from '@/api/common/parse-body'
 import { parseId } from '@/lib/utils'
+import { getActiveSession } from '@/lib/auth/activeSession'
 
 
 const MODULE = 'users'
@@ -35,9 +35,6 @@ async function checkTarget(id: number) {
     return null
 }
 
-const activeSession = () =>
-    prisma.academicYear.findFirst({ where: { is_active: true }, select: { id: true, year_name: true } })
-
 
 // Fetch a user's permissions (every permission item, defaulting to false)
 export async function GET(_request: NextRequest, { params }: Context) {
@@ -47,17 +44,17 @@ export async function GET(_request: NextRequest, { params }: Context) {
     const id = parseId((await params).id)
     if (id === null) return NextResponse.json({ error: 'Invalid id' }, { status: 400 })
 
-    const session = await activeSession()
-    if (!session) return NextResponse.json({ error: 'No active academic session' }, { status: 409 })
+    const { academic_year: activeSession } = await getActiveSession()
+    if (!activeSession) return NextResponse.json({ error: 'No active academic session' }, { status: 409 })
 
     const [items, grants] = await Promise.all([
         prisma.permissionItem.findMany({ orderBy: { id: 'asc' } }),
-        prisma.userPermission.findMany({ where: { user_id: id, session: session.id } }),
+        prisma.userPermission.findMany({ where: { user_id: id, session: activeSession.id } }),
     ])
     const byItem = new Map(grants.map((g) => [g.permission_item_id, g]))
 
     return NextResponse.json({
-        session,
+        session: activeSession,
         permissions: items.map((item) => {
             const g = byItem.get(item.id)
             return {
@@ -92,8 +89,8 @@ export async function PUT(request: NextRequest, { params }: Context) {
     const blocked = await checkTarget(id)
     if (blocked) return blocked
 
-    const session = await activeSession()
-    if (!session) return NextResponse.json({ error: 'No active academic session' }, { status: 409 })
+    const { academic_year: activeSession } = await getActiveSession()
+    if (!activeSession) return NextResponse.json({ error: 'No active academic session' }, { status: 409 })
 
 
     // One entry per permission item (last one wins), then group items that share the same flags
@@ -123,7 +120,7 @@ export async function PUT(request: NextRequest, { params }: Context) {
             // Insert the rows that don't exist yet
             const createData: Array<Flags & { user_id: number; permission_item_id: number; session: number }> = []
             byItem.forEach((flags, permission_item_id) => {
-                createData.push({ ...flags, user_id: id, permission_item_id, session: session.id })
+                createData.push({ ...flags, user_id: id, permission_item_id, session: activeSession.id })
             })
             await tx.userPermission.createMany({
                 data: createData,
@@ -135,7 +132,7 @@ export async function PUT(request: NextRequest, { params }: Context) {
             groups.forEach((group) => groupedPermissions.push(group))
             for (const { flags, ids } of groupedPermissions) {
                 await tx.userPermission.updateMany({
-                    where: { user_id: id, session: session.id, permission_item_id: { in: ids } },
+                    where: { user_id: id, session: activeSession.id, permission_item_id: { in: ids } },
                     data: flags,
                 })
             }

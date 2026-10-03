@@ -11,21 +11,14 @@ import {
 } from 'lucide-react';
 import {fetchAdmissionStates} from '@/lib/actions/payroll/globalMasters/admissionStates.actions';
 import {fetchAcademicYearsForDashboard} from '@/lib/actions/accounts/globalMasters/defineSession/defineAcademicYear.actions';
+import { ActiveSession } from '@/lib/auth/activeSession';
 
 
 // Main function
-export default function Footer () {
+export default function Footer ({session}:{session: ActiveSession}) {
 
     // Logo
     const [logo, setLogo] = useState('');
-
-
-    // Active financial year
-    const [activeFinancialYear, setActiveFinancialYear] = useState('');
-
-
-    // Active academic year
-    const [activeAcademicYearName, setActiveAcademicYearName] = useState('');
 
 
     // Use effect
@@ -36,21 +29,6 @@ export default function Footer () {
         };
         fetcher();
     }, []);
-    useEffect(() => {
-        const academicYearsFetcher = async () => {
-            const res = await fetchAcademicYearsForDashboard();
-            setActiveAcademicYearName(
-                res.academicYears.filter(
-                    (year:any) => year.is_active
-                )[0]?.year_name || ''
-            );
-            setActiveFinancialYear(
-                res.activeFinancialYear.year_name
-            );
-        };
-        academicYearsFetcher();
-    }, []);
-
 
     return (
         <footer className='border-t border-[#E4E9F0] bg-white px-5 py-4 md:px-8'>
@@ -95,7 +73,7 @@ export default function Footer () {
                                 Academic Year
                             </p>
                             <p className='text-xs font-medium text-[#4A586B]'>
-                                {activeAcademicYearName || '—'}
+                                    {session.academic_year?.year_name || '—'}
                             </p>
                         </div>
                     </div>
@@ -114,7 +92,7 @@ export default function Footer () {
                                 Financial Year
                             </p>
                             <p className='text-xs font-medium text-[#4A586B]'>
-                                {activeFinancialYear || '—'}
+                                {session.financial_year?.year_name || '—'} 
                             </p>
                         </div>
                     </div>

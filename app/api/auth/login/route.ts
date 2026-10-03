@@ -5,6 +5,7 @@ import { loginSchema } from "@/lib/validations/auth/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { signToken } from '@/lib/auth/jwt';
 import { setAuthCookie } from '@/lib/auth/session';
+import { getActiveSession } from '@/lib/auth/activeSession';
 
 type UserPermissionWithItem = {
   add: boolean
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
 
         const { username, password } = result.data
 
-        const activeSession = await prisma.academicYear.findFirst({ where: { is_active: true } })
+        const { academic_year: activeSession } = await getActiveSession()
 
         const user = await prisma.user.findUnique({
             where: { user_name: username },

@@ -1,25 +1,8 @@
-'use client';
-// Imports
-import {Suspense} from 'react';
-import LoadingIcon from '@/components/shared/LoadingIcon';
-import Admission from '@/components/Layout/pagesComponents/Admission';
+export default async function Page () {
 
-
-
-
-
-// Main function
-const Home = () => {
   return(
-    <Suspense fallback={<LoadingIcon />}>
-      <Admission />
-    </Suspense>
+    <div>
+      Admission Dashboard
+    </div>
   );
 };
-
-
-
-
-
-// Export
-export default Home;
