@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { fetchUserPermissions, fetchUsers, UserPermissionRow } from '../../../api/users';
+import { fetchUserPermissions, fetchUsers, UserPermissionRow } from '../../../api/users/users';
 
 
 // Users

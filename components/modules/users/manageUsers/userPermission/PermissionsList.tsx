@@ -2,7 +2,7 @@
 // Imports
 import {Checkbox} from '@/components/ui/checkbox';
 import {humanize} from '@/lib/utils';
-import {UserPermissionRow} from '@/api/users';
+import {UserPermissionRow} from '@/api/users/users';
 
 
 const COLUMNS = [

@@ -1,5 +1,5 @@
 import { CreateUserValidation } from '@/lib/validations/users/manageUsers/user.validation'
-import { request } from './common/utils'
+import { request } from '../common/utils'
 import z from 'zod'
 
 

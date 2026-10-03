@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import LoadingIcon from '@/components/shared/LoadingIcon';
 import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
-import { saveUserPermissions, UserPermissionRow } from '@/api/users';
+import { saveUserPermissions, UserPermissionRow } from '@/api/users/users';
 import { useUsersList, useUserPermissions } from '@/lib/hooks/useModuleData/useUsersData';
 import { useCrudForm } from '@/lib/hooks/useCrudForm';
 import { usePermission } from '@/lib/hooks/usePermission';

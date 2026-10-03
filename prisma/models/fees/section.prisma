@@ -11,4 +11,8 @@ model Section {
 
   // Children
   classes Class[]
+
+
+  // Relations
+  @@unique([session, section_name])
 }

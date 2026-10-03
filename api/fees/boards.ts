@@ -1,4 +1,4 @@
-import { request } from './common/utils'
+import { request } from '../common/utils'
 
 
 // Boards dropdown options (active session)

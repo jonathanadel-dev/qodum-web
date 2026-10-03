@@ -1,7 +1,7 @@
 // api/schools.ts
 import z from 'zod'
 import { SchoolValidation } from '@/lib/validations/fees/globalMasters/defineSchool/schoolGlobalDetails.validation'
-import { request } from "./common/utils"
+import { request } from "../common/utils"
 
 
 export type SchoolPayload = z.output<typeof SchoolValidation>

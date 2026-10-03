@@ -4,7 +4,7 @@ import { Form } from '@/components/ui/form';
 import LoadingIcon from '@/components/shared/LoadingIcon';
 import { useToast } from '@/components/ui/use-toast';
 import { CreateUserValidation, UpdateUserValidation } from '@/lib/validations/users/manageUsers/user.validation';
-import { createUser, deleteUser, modifyUser, UserPayload } from '@/api/users';
+import { createUser, deleteUser, modifyUser, UserPayload } from '@/api/users/users';
 import { uploadUserImage } from '@/lib/actions/image.actions';
 import { useUsersList } from '@/lib/hooks/useModuleData/useUsersData';
 import { useCrudForm } from '@/lib/hooks/useCrudForm';

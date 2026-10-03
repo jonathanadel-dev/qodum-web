@@ -6,7 +6,7 @@ import { Form } from '@/components/ui/form';
 import LoadingIcon from '@/components/shared/LoadingIcon';
 import { useToast } from '@/components/ui/use-toast';
 import { SchoolValidation } from '@/lib/validations/fees/globalMasters/defineSchool/schoolGlobalDetails.validation';
-import { createSchool, deleteSchool, modifySchool } from '@/api/schools';
+import { createSchool, deleteSchool, modifySchool } from '@/api/fees/schools';
 import { uploadSchoolLogo } from '@/lib/actions/image.actions';
 import { useBoardsOptions, useSchoolsList } from '@/lib/hooks/useModuleData/useFeesData';
 import { useCrudForm } from '@/lib/hooks/useCrudForm';

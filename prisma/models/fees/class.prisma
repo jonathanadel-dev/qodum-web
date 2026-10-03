@@ -12,10 +12,10 @@ model Class {
     // Parents
     session       Int
     academic_year AcademicYear @relation(fields: [session], references: [id])
-    wing_name Int
-    wing      Wing @relation(fields: [wing_name], references: [id])
-    school    Int
-    school_ref School @relation(fields: [school], references: [id])
+    wing_id       Int
+    wing          Wing @relation(fields: [wing_id], references: [id])
+    school_id     Int
+    school_ref    School @relation(fields: [school_id], references: [id])
 
     // Children
     sections Section[]
@@ -23,4 +23,8 @@ model Class {
     slots Slot[]
     prospectuses Prospectus[]
     enquiries Enquiry[]
+
+
+    // Relations
+    @@unique([session, class_name])
 }
