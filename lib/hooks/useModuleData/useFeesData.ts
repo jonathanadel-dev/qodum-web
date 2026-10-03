@@ -1,3 +1,4 @@
+import { fetchBoardsOptions } from "@/api/boards";
 import { fetchSchools, fetchSchoolsOptions } from "@/api/schools";
 import useSWR from "swr";
 
@@ -9,5 +10,12 @@ export const useSchoolsList = () => {
 };
 export const useSchoolsOptions = () => {
   const { data, isLoading } = useSWR('schools-options', fetchSchoolsOptions, { fallbackData: [] });
+  return { data: data ?? [], isLoading };
+};
+
+
+// Boards
+export const useBoardsOptions = () => {
+  const { data, isLoading } = useSWR('boards-options', fetchBoardsOptions, { fallbackData: [] });
   return { data: data ?? [], isLoading };
 };

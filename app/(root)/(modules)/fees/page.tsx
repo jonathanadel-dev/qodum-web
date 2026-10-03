@@ -1,25 +1,5 @@
-'use client';
-// Imports
-import {Suspense} from 'react';
-import LoadingIcon from '@/components/shared/LoadingIcon';
-import Fees from '@/components/Layout/pagesComponents/Fees';
-
-
-
-
-
-// Main function
-const Home = () => {
+export default function Page () {
   return(
-    <Suspense fallback={<LoadingIcon />}>
-      <Fees />
-    </Suspense>
+    <div>Fees Dashboard</div>
   );
 };
-
-
-
-
-
-// Export
-export default Home;
