@@ -1,3 +1,4 @@
+// lib/validations/fees/globalMasters/defineClassDetails/wing.validation.ts
 // Imports
 import * as z from 'zod';
 

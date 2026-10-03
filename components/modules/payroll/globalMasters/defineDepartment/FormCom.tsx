@@ -1,136 +1,109 @@
+// components/modules/payroll/globalMasters/defineDepartment/FormCom.tsx
 'use client';
-// Imports
-import * as z from 'zod';
-import Buttons from './Buttons';
-import {deepEqual} from '@/lib/utils';
-import {useForm} from 'react-hook-form';
-import {Input} from '@/components/ui/input';
-import {useToast} from '@/components/ui/use-toast';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {DepartmentValidation} from '@/lib/validations/payroll/globalMasters/department.validation';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {createDepartment, deleteDepartment, modifyDepartment} from '@/lib/actions/payroll/globalMasters/department.actions';
+import moment from 'moment';
+import { mutate as globalMutate } from 'swr';
+import { usePathname } from 'next/navigation';
+import { Form } from '@/components/ui/form';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import { useToast } from '@/components/ui/use-toast';
+import { DepartmentValidation } from '@/lib/validations/payroll/globalMasters/department.validation';
+import { createDepartment, deleteDepartment, modifyDepartment } from '@/api/payroll/departments';
+import { useDepartmentsList } from '@/lib/hooks/useModuleData/sePayrollData';
+import { useCrudForm } from '@/lib/hooks/useCrudForm';
+import { usePermission } from '@/lib/hooks/usePermission';
+import { emptyDepartment } from '@/lib/emptyRecords/payroll/emptyDepartment';
+import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
+import CrudButtons from '@/components/shared/crud/CrudButtons';
+import PrintButton from '@/components/shared/crud/PrintButton';
+import { CurrentUser } from '@/lib/auth/session';
+import { getTabPath } from '@/lib/utils';
+
+export default function FormCom({ user }: { user: CurrentUser | null }) {
+
+  const pathname = usePathname();
+  const tabPath = getTabPath(pathname);
+  const { toast } = useToast();
 
 
+  const { data: departments, mutate: mutateDepartments } = useDepartmentsList();
 
 
-
-// Main function
-const FormCom = ({setIsViewOpened, departments, updateDepartment, setUpdateDepartment}:any) => {
-
-    // Toast
-    const {toast} = useToast();
+  const permissions = usePermission(user);
 
 
-    // Comparison object
-    const comparisonObject = {
-        department:updateDepartment.department
-    };
-
-
-    // Form
-    const form = useForm({
-        resolver:zodResolver(DepartmentValidation),
-        defaultValues:{
-            department:updateDepartment.id === '' ? '' : updateDepartment.department
+  const { form, mode, isLoading, save, remove, cancel } = useCrudForm({
+    emptyRecord: emptyDepartment,
+    updateSchema: DepartmentValidation,
+    actions: {
+      create: async (values) => {
+        if (departments.some((item) => item.department === values.department)) {
+          throw new Error('Department already exists');
         }
-    });
+        await createDepartment(values);
+        toast({ title: 'Added Successfully!' });
+      },
+      modify: async (values) => {
+        await modifyDepartment(values);
+        toast({ title: 'Updated Successfully!' });
+      },
+      remove: async (id) => {
+        await deleteDepartment({ id });
+        toast({ title: 'Deleted Successfully!' });
+      },
+    },
+    onDone: () => {
+      mutateDepartments();
+      globalMutate('departments-options');
+    },
+    onError: (error) => {
+      toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
+    },
+  });
 
 
-    // Submit handler
-    const onSubmit = async (values:z.infer<typeof DepartmentValidation>) => {
-        // Create department
-        if(updateDepartment.id === ''){
-            if(departments.map((r:any) => r.department).includes(values.department)){
-                toast({title:'Department already exists', variant:'error'});
-                return;
-            };
-            const res = await createDepartment({
-                department:values.department
-            });
-            if(res === 0){
-                toast({title:'Please create a session first', variant:'alert'});
-                return;
-            };
-            toast({title:'Added Successfully!'});
-        }
-        // Modify department
-        else if(!deepEqual(comparisonObject, values)){
-            if(comparisonObject.department !== values.department && departments.map((r:any) => r.department).includes(values.department)){
-                toast({title:'Department already exists', variant:'error'});
-                return;
-            };
-            await modifyDepartment({
-                id:updateDepartment.id,
-                department:values.department
-            });
-            toast({title:'Updated Successfully!'});
-        }
-        // Delete department
-        else if(updateDepartment.isDeleteClicked){
-            await deleteDepartment({id:updateDepartment.id});
-            toast({title:'Deleted Successfully!'});
-        };
+  const fields: FieldConfig[] = [
+    { type: 'text', name: 'department', label: 'Department' },
+  ];
 
+  return (
+    <div className='w-full max-w-xl mx-auto mb-10 rounded-[8px] border border-[#E8E8E8] bg-white overflow-hidden'>
+      <h2 className='w-full py-3 text-sm text-center font-bold rounded-t-lg bg-[#e7f0f7] text-main-color border-b border-[#F0F0F0]'>
+        Define Department
+      </h2>
+      <Form {...form}>
+        <form onSubmit={save} className='flex flex-col gap-6 p-5 sm:p-8'>
 
-        // Reseting update entity
-        setUpdateDepartment({
-            id:'',
-            isDeleteClicked:false,
-            department:''
-        });
-        // Reseting form
-        form.reset({
-            department:''
-        });
-    };
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5'>
+            {fields.map((field) => <DynamicField key={field.name} field={field} control={form.control} />)}
+          </div>
 
-    return (
-        <div className='w-[90%] max-w-[500px] flex flex-col items-center rounded-[8px] border-[0.5px] border-[#E8E8E8] sm:w-[80%]'>
-            <h2 className='w-full text-center py-2 text-sm rounded-t-[8px] font-bold bg-[#e7f0f7] text-main-color'>Define Department</h2>
-            <Form
-                {...form}
-            >
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className='relative w-full flex flex-col pt-4 items-center px-2 sm:px-4'
-                >
+          <div className='flex justify-center pt-5 border-t border-[#F0F0F0]'>
+            {isLoading ? <LoadingIcon /> : (
+              <CrudButtons
+                mode={mode}
+                permissions={permissions}
+                viewHref={`${tabPath}/view`}
+                onSave={save}
+                onDelete={remove}
+                onCancel={cancel}
+                printSlot={
+                  <PrintButton
+                    data={departments}
+                    title='Departments List'
+                    filename='Departments List'
+                    sheetName='Departments'
+                    columns={[
+                      { title: 'Department', width: 120, value: (item: any) => item?.department },
+                      { title: 'Modified Date', width: 100, value: (item: any) => moment(item?.updated_at).format('D-MMM-yy') },
+                    ]}
+                  />
+                }
+              />
+            )}
+          </div>
 
-                    {/* Name */}
-                    <FormField
-                        control={form.control}
-                        name='department'
-                        render={({field}) => (
-                            <FormItem className='w-full h-10 flex flex-col items-start justify-center mt-2 sm:flex-row sm:items-center'>
-                                <FormLabel className='basis-auto pr-2 text-end text-xs text-[#726E71] sm:basis-[30%]'>Department</FormLabel>
-                                <div className='w-full flex flex-col items-start gap-4 sm:basis-[70%]'>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            className='flex flex-row items-center text-xs pl-2 bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4]'
-                                        />
-                                    </FormControl>
-                                    <div className='mt-[-10px] text-xs'>
-                                        <FormMessage />
-                                    </div>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-
-                    {/* Buttons */}
-                    <Buttons setIsViewOpened={setIsViewOpened} departments={departments} updateDepartment={updateDepartment} setUpdateDepartment={setUpdateDepartment} onSubmit={onSubmit} form={form}/>
-
-                </form>
-            </Form>
-        </div>
-    );
-};
-
-
-
-
-
-// Export
-export default FormCom;
+        </form>
+      </Form>
+    </div>
+  );
+}

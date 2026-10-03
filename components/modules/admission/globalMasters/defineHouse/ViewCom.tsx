@@ -1,144 +1,31 @@
-// Imports
+// components/modules/admission/globalMasters/defineHouse/ViewCom.tsx
+'use client';
 import moment from 'moment';
-import {Button} from '@/components/ui/button';
-import {ChevronsUpDown, X} from 'lucide-react';
-import LoadingIcon from '@/components/shared/LoadingIcon';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Command, CommandEmpty, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
+import { usePathname } from 'next/navigation';
+import type { HouseRecord } from '@/api/admission/houses';
+import { useHousesList } from '@/lib/hooks/useModuleData/useAdmissionData';
+import { emptyHouse } from '@/lib/emptyRecords/admission/emptyHouse';
+import ListView from '@/components/shared/crud/ListView';
+import { getTabPath } from '@/lib/utils';
 
+export default function ViewCom () {
 
+  const pathname = usePathname();
+  const tabPath = getTabPath(pathname);
 
+  const { data: houses, isLoading } = useHousesList();
 
-
-// Main Function
-const ViewCom = ({setIsViewOpened, houses, setUpdateHouse}:any) => {
-
-
-    // Select handler
-    const selectHandler = (house:any) => {
-        setUpdateHouse({
-            id: house._id,
-            isDeleteClicked:false,
-            house_name:house.house_name
-        });
-        setIsViewOpened(false);
-    };
-
-
-    return (
-        <Command
-            className='w-[90%] max-h-[90%] flex flex-col items-center pb-2 gap-2 rounded-[8px] border-[0.5px] border-[#E8E8E8] lg:w-[70%]'
-        >
-
-            {/* Header */}
-            <div className='flex flex-row items-center justify-between w-full px-2 py-2 text-sm font-bold text-main-color bg-[#e7f0f7] rounded-t-[8px]'>
-                <h2>Houses List</h2>
-                <X color='#3a3a3a' size={18} cursor={'pointer'} onClick={() => setIsViewOpened(false)}/>
-            </div>
-            <div className='w-[95%] h-[90%] flex flex-col items-center border-[1px] border-[#ccc] bg-[#F1F1F1] rounded-[8px]'>
-
-
-                {/* Search input */}
-                <div className='w-full flex flex-row justify-end pr-4 py-2 border-b-2 border-[#ccc]'>
-                    <CommandInput
-                        placeholder='Search list'
-                        className='h-full text-xs text-hash-color w-[250px] bg-white'
-                    />
-                </div>
-
-
-                {/* Houses */}
-                <div className='w-full flex flex-col h-[90%] overflow-scroll custom-sidebar-scrollbar'>
-                    {/* Headers */}
-                    <ul className='w-full min-w-[600px] flex flex-row text-[10px] border-b-2 border-[#ccc] text-hash-color cursor-pointer sm:text-xs md:text-md'>
-                        <li className='basis-[15%] flex flex-row items-center justify-between px-2 py-[2px] border-r-2 border-[#ccc]'>
-                            Sr. No.
-                            <ChevronsUpDown size={12}/>
-                        </li>
-                        <li className='basis-[15%] flex flex-row items-center justify-between px-2 border-r-2 border-[#ccc]'>
-                            Select
-                            <ChevronsUpDown size={12}/>
-                        </li>
-                        <li className='basis-[40%] flex flex-row items-center justify-between px-2 border-r-2 border-[#ccc]'>
-                            House Name
-                            <ChevronsUpDown size={12}/>
-                        </li>
-                        <li className='basis-[40%] flex flex-row items-center justify-between px-2'>
-                            Modify Details
-                            <ChevronsUpDown size={12}/>
-                        </li>
-                    </ul>
-                    {/* Values */}
-                    <CommandList>
-                        {
-                            houses.length < 1 ? (
-                                <p className='w-full flex flex-row p-2 text-sm bg-[#E2E4FF] border-b-2 border-[#ccc]'>
-                                    No houses yet
-                                </p>
-                            ) : !houses[0]?.house_name ? (
-                                    <LoadingIcon />
-                                ) : houses.map((house:any, index:number) => (
-                                    <CommandItem
-                                        key={index}
-                                        value={`${houses.indexOf(house) + 1} ${house.house_name}`}
-                                        className='w-full min-w-[600px] flex flex-row text-[10px] bg-[#E2E4FF] border-b-2 border-[#ccc] sm:text-xs md:text-md'
-                                    >
-                                        <li className='basis-[15%] flex flex-row items-center px-2 border-r-2 border-[#ccc]'>{houses.indexOf(house) + 1}</li>
-                                        <li className='basis-[15%] flex flex-row items-center justify-center px-2 border-r-2 border-[#ccc]'>
-                                            <Button
-                                                className='px-[8px] h-6 text-[10px] text-white bg-gradient-to-r from-[#3D67B0] to-[#4CA7DE] transition border-[1px] rounded-full border-[#E2E4FF]
-                                                hover:border-main-color hover:from-[#e7f0f7] hover:to-[#e7f0f7] hover:text-main-color sm:text-xs sm:px-4'
-                                                onClick={() => selectHandler(house)}
-                                            >
-                                                Select
-                                            </Button>
-                                        </li>
-                                        <li className='basis-[40%] flex flex-row items-center px-2 border-r-2 border-[#ccc]'>{house.house_name}</li>
-                                        <li className='basis-[40%] flex flex-row items-center px-2'>{moment(house.updateAt).format('D-MMM-yy')}</li>
-                                    </CommandItem>
-                                ))
-                        }
-                    </CommandList>
-                    <CommandEmpty>No results found</CommandEmpty>
-                </div>
-
-
-                {/* Buttons */}
-                <div className='w-full flex flex-row items-center justify-between py-4 px-2 border-t-[0.5px] border-[#ccc]'>
-                    {/* Items per page */}
-                    <div className='text-[10px] flex flex-col items-center gap-2 sm:text-sm sm:flex-row'>
-                        <p className='text-hash-color'>Items per page:</p>
-                        <Select>
-                            <SelectTrigger className='flex flex-row items-center h-8 pl-2 text-[10px] bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4] sm:text-xs'>
-                                <SelectValue placeholder='1000' className='text-xs'/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value='10'>10</SelectItem>
-                                <SelectItem value='15'>15</SelectItem>
-                                <SelectItem value='50'>50</SelectItem>
-                                <SelectItem value='100'>100</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    {/* Skipping */}
-                    <div className='flex flex-row items-center gap-[2px] sm:gap-[4px]'>
-                        <Button disabled className='h-5 text-[10px] my-[0.5px] px-2 bg-white rounded-[5px] text-hash-color hover:bg-[#F1F1F1] sm:text-xs sm:px-4 sm:h-7 xl:px-6'>First</Button>
-                        <Button disabled className='h-5 text-[10px] my-[0.5px] px-2 bg-white rounded-[5px] text-hash-color hover:bg-[#F1F1F1] sm:text-xs sm:px-4 sm:h-7 xl:px-6'>Prev.</Button>
-                        <Button disabled className='h-5 text-[10px] my-[0.5px] px-2 bg-white rounded-[5px] text-hash-color hover:bg-[#F1F1F1] sm:text-xs sm:px-4 sm:h-7 xl:px-6'>1</Button>
-                        <Button disabled className='h-5 text-[10px] my-[0.5px] px-2 bg-white rounded-[5px] text-hash-color hover:bg-[#F1F1F1] sm:text-xs sm:px-4 sm:h-7 xl:px-6'>Next</Button>
-                        <Button disabled className='h-5 text-[10px] my-[0.5px] px-2 bg-white rounded-[5px] text-hash-color hover:bg-[#F1F1F1] sm:text-xs sm:px-4 sm:h-7 xl:px-6'>Last</Button>
-                    </div>
-                </div>
-
-
-            </div>
-        </Command>
-    );
-};
-
-
-
-
-
-// Export
-export default ViewCom;
+  return (
+    <ListView<HouseRecord | typeof emptyHouse>
+      title='Houses List'
+      data={houses}
+      isLoading={isLoading}
+      emptyRecord={emptyHouse}
+      tabPath={tabPath}
+      columns={[
+        { title: 'House Name', value: (record) => record.house_name },
+        { title: 'Modified Date', value: (record) => moment('updated_at' in record ? record.updated_at : '').format('D-MMM-yy') },
+      ]}
+    />
+  );
+}

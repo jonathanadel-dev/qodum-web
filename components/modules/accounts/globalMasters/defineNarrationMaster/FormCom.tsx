@@ -1,170 +1,121 @@
+// components/modules/accounts/globalMasters/defineNarrationMaster/FormCom.tsx
 'use client';
-// Imports
-import * as z from 'zod';
-import Buttons from './Buttons';
-import {deepEqual} from '@/lib/utils';
-import {useForm} from 'react-hook-form';
-import {ChevronDown} from 'lucide-react';
-import {Textarea} from '@/components/ui/textarea';
-import {useToast} from '@/components/ui/use-toast';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {NarrationMasterValidation} from '@/lib/validations/accounts/globalMasters/narrationMaster';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {createNarrationMaster, deleteNarrationMaster, modifyNarrationMaster} from '@/lib/actions/accounts/globalMasters/defineNarrationMasters.actions';
+import moment from 'moment';
+import { usePathname } from 'next/navigation';
+import { Form } from '@/components/ui/form';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import { useToast } from '@/components/ui/use-toast';
+import { NarrationMasterValidation } from '@/lib/validations/accounts/globalMasters/narrationMaster';
+import { createNarrationMaster, deleteNarrationMaster, modifyNarrationMaster } from '@/api/accounts/narrationMasters';
+import { useNarrationMastersList } from '@/lib/hooks/useModuleData/useAccountsData';
+import { useCrudForm } from '@/lib/hooks/useCrudForm';
+import { usePermission } from '@/lib/hooks/usePermission';
+import { emptyNarrationMaster } from '@/lib/emptyRecords/accounts/emptyNarrationMaster';
+import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
+import CrudButtons from '@/components/shared/crud/CrudButtons';
+import PrintButton from '@/components/shared/crud/PrintButton';
+import { CurrentUser } from '@/lib/auth/session';
+import { getTabPath } from '@/lib/utils';
+
+const voucherTypes = [
+  { value: 'CashPaymentVoucher', label: 'Cash Payment Voucher' },
+  { value: 'CashReceiptVoucher', label: 'Cash Receipt Voucher' },
+  { value: 'BankPaymentVoucher', label: 'Bank Payment Voucher' },
+  { value: 'BankReceiptVoucher', label: 'Bank Receipt Voucher' },
+  { value: 'ContraVoucher', label: 'Contra Voucher' },
+  { value: 'JournalVoucher', label: 'Journal Voucher' },
+];
+
+const formatVoucherType = (value: string) =>
+  voucherTypes.find((voucherType) => voucherType.value === value)?.label ?? value;
+
+export default function FormCom({ user }: { user: CurrentUser | null }) {
+
+  const pathname = usePathname();
+  const tabPath = getTabPath(pathname);
+  const { toast } = useToast();
 
 
+  const { data: narrations, mutate: mutateNarrations } = useNarrationMastersList();
 
 
-
-// Main function
-const FormCom = ({setIsViewOpened, narrations, updateNarration, setUpdateNarration}:any) => {
+  const permissions = usePermission(user);
 
 
-    // Toast
-    const {toast} = useToast();
-
-
-    // Comparison object
-    const comparisonObject = {
-        narration:updateNarration.narration,
-        voucher_type:updateNarration.voucher_type
-    };
-
-
-    // Form
-    const form = useForm({
-        resolver:zodResolver(NarrationMasterValidation),
-        defaultValues:{
-            narration:updateNarration.id === '' ? '' : updateNarration.narration,
-            voucher_type:updateNarration.id === '' ? 'Cash Payment Voucher' : updateNarration.voucher_type
+  const { form, mode, isLoading, save, remove, cancel } = useCrudForm({
+    emptyRecord: emptyNarrationMaster,
+    updateSchema: NarrationMasterValidation,
+    actions: {
+      create: async (values) => {
+        if (narrations.some((item) => item.narration === values.narration)) {
+          throw new Error('Narration already exists');
         }
-    });
+        await createNarrationMaster(values);
+        toast({ title: 'Added Successfully!' });
+      },
+      modify: async (values) => {
+        await modifyNarrationMaster(values);
+        toast({ title: 'Updated Successfully!' });
+      },
+      remove: async (id) => {
+        await deleteNarrationMaster({ id });
+        toast({ title: 'Deleted Successfully!' });
+      },
+    },
+    onDone: () => {
+      mutateNarrations();
+    },
+    onError: (error) => {
+      toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
+    },
+  });
 
 
-    // Submit handler
-    const onSubmit = async (values:z.infer<typeof NarrationMasterValidation>) => {
-        // Create Narration
-        if(updateNarration.id === ''){
-            const res = await createNarrationMaster({
-                voucher_type:values.voucher_type,
-                narration:values.narration
-            });
-            if(res === 0){
-                toast({title:'Please create a session first', variant:'alert'});
-                return;
-            };
-            toast({title:'Added Successfully!'});
-        }
-        // Modify Narration
-        else if(!deepEqual(comparisonObject, values)){
-            await modifyNarrationMaster({
-                id:updateNarration.id,
-                narration:values.narration,
-                voucher_type:values.voucher_type
-            });
-            toast({title:'Updated Successfully!'});
-        }
-        // Delete Narration
-        else if(updateNarration.isDeleteClicked){
-            await deleteNarrationMaster({id:updateNarration.id});
-            toast({title:'Deleted Successfully!'});
-        };
+  const fields: FieldConfig[] = [
+    { type: 'select', name: 'voucher_type', label: 'Voucher Type', options: voucherTypes },
+    { type: 'text', name: 'narration', label: 'Narration', span: 'full' },
+  ];
 
+  return (
+    <div className='w-full max-w-2xl mx-auto mb-10 rounded-[8px] border border-[#E8E8E8] bg-white overflow-hidden'>
+      <h2 className='w-full py-3 text-sm text-center font-bold rounded-t-lg bg-[#e7f0f7] text-main-color border-b border-[#F0F0F0]'>
+        Define Narration Master
+      </h2>
+      <Form {...form}>
+        <form onSubmit={save} className='flex flex-col gap-6 p-5 sm:p-8'>
 
-        // Reseting update entity
-        setUpdateNarration({
-            id:'',
-            narration:'',
-            voucher_type:'',
-            isDeleteClicked:false
-        });
-        // Reseting form
-        form.reset({
-            narration:'',
-            voucher_type:'Cash Payment Voucher'
-        });
-    };
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5'>
+            {fields.map((field) => <DynamicField key={field.name} field={field} control={form.control} />)}
+          </div>
 
+          <div className='flex justify-center pt-5 border-t border-[#F0F0F0]'>
+            {isLoading ? <LoadingIcon /> : (
+              <CrudButtons
+                mode={mode}
+                permissions={permissions}
+                viewHref={`${tabPath}/view`}
+                onSave={save}
+                onDelete={remove}
+                onCancel={cancel}
+                printSlot={
+                  <PrintButton
+                    data={narrations}
+                    title='Narrations List'
+                    filename='Narrations List'
+                    sheetName='Narrations'
+                    columns={[
+                      { title: 'Narration', width: 180, value: (item: any) => item?.narration },
+                      { title: 'Voucher Type', width: 150, value: (item: any) => formatVoucherType(item?.voucher_type ?? '') },
+                      { title: 'Modified Date', width: 100, value: (item: any) => moment(item?.updated_at).format('D-MMM-yy') },
+                    ]}
+                  />
+                }
+              />
+            )}
+          </div>
 
-    return (
-        <div className='w-[90%] max-w-[500px] flex flex-col items-center rounded-[8px] border-[0.5px] border-[#E8E8E8] sm:w-[80%]'>
-            <h2 className='w-full text-center py-2 text-sm rounded-t-[8px] font-bold bg-[#e7f0f7] text-main-color'>Define Narration Master</h2>
-            <Form
-                {...form}
-            >
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className='w-full flex flex-col items-center px-2 sm:px-4'
-                >
-
-                    {/* Narration */}
-                    <FormField
-                        control={form.control}
-                        name='voucher_type'
-                        render={({field}) => (
-                            <FormItem className='w-full flex flex-col items-start justify-center mt-2 sm:flex-row sm:items-center sm:gap-2 sm:mt-4'>
-                                <FormLabel className='basis-auto text-xs text-[#726E71] sm:basis-[30%]'>Select voucher type</FormLabel>
-                                <FormControl>
-                                    <Select
-                                        {...field}
-                                        value={field.value}
-                                        onValueChange={field.onChange}
-                                    >
-                                        <SelectTrigger className='w-full h-8 flex flex-row items-center text-xs pl-2 bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4] rounded-none sm:basis-[70%]'>
-                                            <SelectValue placeholder='Cash payment voucher'/>
-                                            <ChevronDown className='h-4 w-4 opacity-50'/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value='Cash Payment Voucher'>Cash Payment Voucher</SelectItem>
-                                            <SelectItem value='Cash Receipt Voucher'>Cash Receipt Voucher</SelectItem>
-                                            <SelectItem value='Bank Payment Voucher'>Bank Payment Voucher</SelectItem>
-                                            <SelectItem value='Bank Receipt Voucher'>Bank Receipt Voucher</SelectItem>
-                                            <SelectItem value='Contra Voucher'>Contra Voucher</SelectItem>
-                                            <SelectItem value='Journal Voucher'>Journal Voucher</SelectItem>
-                                            <SelectItem value='Payment Voucher'>Payment Voucher</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
-
-
-                    {/* Voucher type */}
-                    <FormField
-                        control={form.control}
-                        name='narration'
-                        render={({field}) => (
-                            <FormItem className='w-full flex flex-col items-start justify-center mt-2 sm:flex-row sm:items-center sm:gap-2'>
-                                <FormLabel className='basis-auto text-xs text-[#726E71] sm:basis-[30%]'>Narration</FormLabel>
-                                <div className='w-full h-full flex flex-col items-start gap-4 sm:basis-[70%]'>
-                                    <FormControl>
-                                        <Textarea
-                                            {...field}
-                                            className='flex flex-row items-center h-full text-xs pl-2 bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4] resize-none'
-                                        />
-                                    </FormControl>
-                                    <FormMessage className='text-xs'/>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-
-                    {/* Buttons */}
-                    <div className='sm:px-10'>
-                        <Buttons setIsViewOpened={setIsViewOpened} narrations={narrations} updateNarration={updateNarration} setUpdateNarration={setUpdateNarration} onSubmit={onSubmit} form={form}/>
-                    </div>
-                </form>
-            </Form>
-        </div>
-    );
-};
-
-
-
-
-
-// Export
-export default FormCom;
+        </form>
+      </Form>
+    </div>
+  );
+}

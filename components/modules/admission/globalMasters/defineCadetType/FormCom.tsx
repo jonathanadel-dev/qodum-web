@@ -1,141 +1,109 @@
+// components/modules/admission/globalMasters/defineCadetType/FormCom.tsx
 'use client';
-// Imports
-import * as z from 'zod';
-import Buttons from './Buttons';
-import {deepEqual} from '@/lib/utils';
-import {useForm} from 'react-hook-form';
-import {Input} from '@/components/ui/input';
-import {useToast} from '@/components/ui/use-toast';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {CadetTypeValidation} from '@/lib/validations/admission/globalMasters/cadetType.validation';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {createCadetType, deleteCadetType, modifyCadetType} from '@/lib/actions/admission/globalMasters/cadetType.actions';
+import moment from 'moment';
+import { mutate as globalMutate } from 'swr';
+import { usePathname } from 'next/navigation';
+import { Form } from '@/components/ui/form';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import { useToast } from '@/components/ui/use-toast';
+import { CadetTypeValidation } from '@/lib/validations/admission/globalMasters/cadetType.validation';
+import { createCadetType, deleteCadetType, modifyCadetType } from '@/api/admission/cadetTypes';
+import { useCadetTypesList } from '@/lib/hooks/useModuleData/useAdmissionData';
+import { useCrudForm } from '@/lib/hooks/useCrudForm';
+import { usePermission } from '@/lib/hooks/usePermission';
+import { emptyCadetType } from '@/lib/emptyRecords/admission/emptyCadetType';
+import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
+import CrudButtons from '@/components/shared/crud/CrudButtons';
+import PrintButton from '@/components/shared/crud/PrintButton';
+import { CurrentUser } from '@/lib/auth/session';
+import { getTabPath } from '@/lib/utils';
+
+export default function FormCom ({ user }: { user: CurrentUser | null }) {
+
+  const pathname = usePathname();
+  const tabPath = getTabPath(pathname);
+  const { toast } = useToast();
 
 
+  const { data: cadetTypes, mutate: mutateCadetTypes } = useCadetTypesList();
 
 
-
-// Main function
-const FormCom = ({setIsViewOpened, cadetTypes, updateCadetType, setUpdateCadetType}:any) => {
+  const permissions = usePermission(user);
 
 
-    // Toast
-    const {toast} = useToast();
-
-
-    // Comparison object
-    const comparisonObject = {
-        name:updateCadetType.name
-    };
-
-
-    // Form
-    const form = useForm({
-        resolver:zodResolver(CadetTypeValidation),
-        defaultValues:{
-            name:updateCadetType.id === '' ? '' : updateCadetType.name
+  const { form, mode, isLoading, save, remove, cancel } = useCrudForm({
+    emptyRecord: emptyCadetType,
+    updateSchema: CadetTypeValidation,
+    actions: {
+      create: async (values) => {
+        if (cadetTypes.some((record) => record.name === values.name)) {
+          throw new Error('Cadet type already exists');
         }
-    });
+        await createCadetType(values);
+        toast({ title: 'Added Successfully!' });
+      },
+      modify: async (values) => {
+        await modifyCadetType(values);
+        toast({ title: 'Updated Successfully!' });
+      },
+      remove: async (id) => {
+        await deleteCadetType({ id });
+        toast({ title: 'Deleted Successfully!' });
+      },
+    },
+    onDone: () => {
+      mutateCadetTypes();
+      globalMutate('cadet-types-options');
+    },
+    onError: (error) => {
+      toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
+    },
+  });
 
 
-    // Submit handler
-    const onSubmit = async (values:z.infer<typeof CadetTypeValidation>) => {
-        // Create cadet type
-        if(updateCadetType.id === ''){
-            if(cadetTypes.map((r:any) => r.name).includes(values.name)){
-                toast({title:'Cadet type already exists', variant:'error'});
-                return;
-            };
-            const res = await createCadetType({
-                name:values.name
-            });
-            if(res === 0){
-                toast({title:'Please create a session first', variant:'alert'});
-                return;
-            };
-            toast({title:'Added Successfully!'});
-        }
-        // Modify cadet type
-        else if(!deepEqual(comparisonObject, values)){
-            if(comparisonObject.name !== values.name && cadetTypes.map((r:any) => r.name).includes(values.name)){
-                toast({title:'Cadet type already exists', variant:'error'});
-                return;
-            };
-            await modifyCadetType({
-                id:updateCadetType.id,
-                name:values.name
-            });
-            toast({title:'Updated Successfully!'});
-        }
-        // Delete cadet type
-        else if(updateCadetType.isDeleteClicked){
-            await deleteCadetType({id:updateCadetType.id});
-            toast({title:'Deleted Successfully!'});
-        };
+  const fields: FieldConfig[] = [
+    { type: 'text', name: 'name', label: 'Name' },
+  ];
 
+  return (
+    <div className='w-full max-w-xl mx-auto mb-10 rounded-[8px] border border-[#E8E8E8] bg-white overflow-hidden'>
+      <h2 className='w-full py-3 text-sm text-center font-bold rounded-t-lg bg-[#e7f0f7] text-main-color border-b border-[#F0F0F0]'>
+        Define Cadet Type
+      </h2>
+      <Form {...form}>
+        <form onSubmit={save} className='flex flex-col gap-6 p-5 sm:p-8'>
 
-        // Reseting update entity
-        setUpdateCadetType({
-            id:'',
-            isDeleteClicked:false,
-            name:''
-        });
-        // Reseting form
-        form.reset({
-            name:''
-        });
-    };
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5'>
+            {fields.map((f) => <DynamicField key={f.name} field={f} control={form.control} />)}
+          </div>
 
+          <div className='flex justify-center pt-5 border-t border-[#F0F0F0]'>
+            {isLoading ? <LoadingIcon /> : (
+              <CrudButtons
+                mode={mode}
+                permissions={permissions}
+                viewHref={`${tabPath}/view`}
+                onSave={save}
+                onDelete={remove}
+                onCancel={cancel}
+                printSlot={
+                  <PrintButton
+                    data={cadetTypes}
+                    title='Cadet Types List'
+                    filename='Cadet Types List'
+                    sheetName='Cadet Types'
+                    columns={[
+                      { title: 'Name', width: 100, value: (record: any) => record?.name },
+                      { title: 'Modified Date', width: 100, value: (record: any) => moment(record?.updated_at).format('D-MMM-yy') },
+                    ]}
+                  />
+                }
+              />
+            )}
+          </div>
 
-    return (
-        <div className='w-[90%] max-w-[500px] flex flex-col items-center rounded-[8px] border-[0.5px] border-[#E8E8E8] sm:w-[80%]'>
-            <h2 className='w-full text-center py-2 text-sm rounded-t-[8px] font-bold bg-[#e7f0f7] text-main-color'>Define Cadet Type</h2>
-            <Form
-                {...form}
-            >
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className='relative w-full flex flex-col pt-4 items-center px-2 sm:px-4'
-                >
-
-
-
-                    {/* Name */}
-                    <FormField
-                        control={form.control}
-                        name='name'
-                        render={({field}) => (
-                            <FormItem className='w-full h-10 flex flex-col items-start justify-center mt-2 sm:flex-row sm:items-center'>
-                                <FormLabel className='basis-auto pr-2 text-end text-xs text-[#726E71] sm:basis-[30%]'>Name</FormLabel>
-                                <div className='w-full flex flex-col items-start gap-4 sm:basis-[70%]'>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            className='flex flex-row items-center text-xs pl-2 bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4]'
-                                        />
-                                    </FormControl>
-                                    <div className='mt-[-10px] text-xs'>
-                                        <FormMessage />
-                                    </div>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-
-                    {/* Buttons */}
-                    <Buttons setIsViewOpened={setIsViewOpened} cadetTypes={cadetTypes} updateCadetType={updateCadetType} setUpdateCadetType={setUpdateCadetType} onSubmit={onSubmit} form={form}/>
-
-                    
-                </form>
-            </Form>
-        </div>
-    );
-};
-
-
-
-
-
-// Export
-export default FormCom;
+        </form>
+      </Form>
+    </div>
+  );
+}

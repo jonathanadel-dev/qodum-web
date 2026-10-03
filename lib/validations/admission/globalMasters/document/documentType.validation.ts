@@ -1,3 +1,4 @@
+// lib/validations/admission/globalMasters/document/documentType.validation.ts
 // Imports
 import * as z from 'zod';
 

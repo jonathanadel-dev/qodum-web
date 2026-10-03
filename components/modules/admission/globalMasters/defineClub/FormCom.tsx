@@ -1,139 +1,109 @@
+// components/modules/admission/globalMasters/defineClub/FormCom.tsx
 'use client';
-// Imports
-import * as z from 'zod';
-import Buttons from './Buttons';
-import {deepEqual} from '@/lib/utils';
-import {useForm} from 'react-hook-form';
-import {Input} from '@/components/ui/input';
-import {useToast} from '@/components/ui/use-toast';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {ClubValidation} from '@/lib/validations/admission/globalMasters/club.validation';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {createClub, deleteClub, modifyClub} from '@/lib/actions/admission/globalMasters/club.actions';
+import moment from 'moment';
+import { mutate as globalMutate } from 'swr';
+import { usePathname } from 'next/navigation';
+import { Form } from '@/components/ui/form';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import { useToast } from '@/components/ui/use-toast';
+import { ClubValidation } from '@/lib/validations/admission/globalMasters/club.validation';
+import { createClub, deleteClub, modifyClub } from '@/api/admission/clubs';
+import { useClubsList } from '@/lib/hooks/useModuleData/useAdmissionData';
+import { useCrudForm } from '@/lib/hooks/useCrudForm';
+import { usePermission } from '@/lib/hooks/usePermission';
+import { emptyClub } from '@/lib/emptyRecords/admission/emptyClub';
+import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
+import CrudButtons from '@/components/shared/crud/CrudButtons';
+import PrintButton from '@/components/shared/crud/PrintButton';
+import { CurrentUser } from '@/lib/auth/session';
+import { getTabPath } from '@/lib/utils';
+
+export default function FormCom ({ user }: { user: CurrentUser | null }) {
+
+  const pathname = usePathname();
+  const tabPath = getTabPath(pathname);
+  const { toast } = useToast();
 
 
+  const { data: clubs, mutate: mutateClubs } = useClubsList();
 
 
-
-// Main function
-const FormCom = ({setIsViewOpened, clubs, updateClub, setUpdateClub}:any) => {
-
-    // Toast
-    const {toast} = useToast();
+  const permissions = usePermission(user);
 
 
-    // Comparison object
-    const comparisonObject = {
-        name:updateClub.name
-    };
-
-
-    // Form
-    const form = useForm({
-        resolver:zodResolver(ClubValidation),
-        defaultValues:{
-            name:updateClub.id === '' ? '' : updateClub.name
+  const { form, mode, isLoading, save, remove, cancel } = useCrudForm({
+    emptyRecord: emptyClub,
+    updateSchema: ClubValidation,
+    actions: {
+      create: async (values) => {
+        if (clubs.some((record) => record.name === values.name)) {
+          throw new Error('Club already exists');
         }
-    });
+        await createClub(values);
+        toast({ title: 'Added Successfully!' });
+      },
+      modify: async (values) => {
+        await modifyClub(values);
+        toast({ title: 'Updated Successfully!' });
+      },
+      remove: async (id) => {
+        await deleteClub({ id });
+        toast({ title: 'Deleted Successfully!' });
+      },
+    },
+    onDone: () => {
+      mutateClubs();
+      globalMutate('clubs-options');
+    },
+    onError: (error) => {
+      toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
+    },
+  });
 
 
-    // Submit handler
-    const onSubmit = async (values:z.infer<typeof ClubValidation>) => {
-        // Create club
-        if(updateClub.id === ''){
-            if(clubs.map((r:any) => r.name).includes(values.name)){
-                toast({title:'Club already exists', variant:'error'});
-                return;
-            };
-            const res = await createClub({
-                name:values.name
-            });
-            if(res === 0){
-                toast({title:'Please create a session first', variant:'alert'});
-                return;
-            };
-            toast({title:'Added Successfully!'});
-        }
-        // Modify club
-        else if(!deepEqual(comparisonObject, values)){
-            if(comparisonObject.name !== values.name && clubs.map((r:any) => r.name).includes(values.name)){
-                toast({title:'Club already exists', variant:'error'});
-                return;
-            };
-            await modifyClub({
-                id:updateClub.id,
-                name:values.name
-            });
-            toast({title:'Updated Successfully!'});
-        }
-        // Delete club
-        else if(updateClub.isDeleteClicked){
-            await deleteClub({id:updateClub.id});
-            toast({title:'Deleted Successfully!'});
-        };
+  const fields: FieldConfig[] = [
+    { type: 'text', name: 'name', label: 'Name' },
+  ];
 
+  return (
+    <div className='w-full max-w-xl mx-auto mb-10 rounded-[8px] border border-[#E8E8E8] bg-white overflow-hidden'>
+      <h2 className='w-full py-3 text-sm text-center font-bold rounded-t-lg bg-[#e7f0f7] text-main-color border-b border-[#F0F0F0]'>
+        Define Club
+      </h2>
+      <Form {...form}>
+        <form onSubmit={save} className='flex flex-col gap-6 p-5 sm:p-8'>
 
-        // Reseting update entity
-        setUpdateClub({
-            id:'',
-            isDeleteClicked:false,
-            name:''
-        });
-        // Reseting form
-        form.reset({
-            name:''
-        });
-    };
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5'>
+            {fields.map((f) => <DynamicField key={f.name} field={f} control={form.control} />)}
+          </div>
 
-    return (
-        <div className='w-[90%] max-w-[500px] flex flex-col items-center rounded-[8px] border-[0.5px] border-[#E8E8E8] sm:w-[80%]'>
-            <h2 className='w-full text-center py-2 text-sm rounded-t-[8px] font-bold bg-[#e7f0f7] text-main-color'>Define Club</h2>
-            <Form
-                {...form}
-            >
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className='relative w-full flex flex-col pt-4 items-center px-2 sm:px-4'
-                >
+          <div className='flex justify-center pt-5 border-t border-[#F0F0F0]'>
+            {isLoading ? <LoadingIcon /> : (
+              <CrudButtons
+                mode={mode}
+                permissions={permissions}
+                viewHref={`${tabPath}/view`}
+                onSave={save}
+                onDelete={remove}
+                onCancel={cancel}
+                printSlot={
+                  <PrintButton
+                    data={clubs}
+                    title='Clubs List'
+                    filename='Clubs List'
+                    sheetName='Clubs'
+                    columns={[
+                      { title: 'Club Name', width: 120, value: (record: any) => record?.name },
+                      { title: 'Modified Date', width: 100, value: (record: any) => moment(record?.updated_at).format('D-MMM-yy') },
+                    ]}
+                  />
+                }
+              />
+            )}
+          </div>
 
-
-
-                    {/* Name */}
-                    <FormField
-                        control={form.control}
-                        name='name'
-                        render={({field}) => (
-                            <FormItem className='w-full h-10 flex flex-col items-start justify-center mt-2 sm:flex-row sm:items-center'>
-                                <FormLabel className='basis-auto pr-2 text-end text-xs text-[#726E71] sm:basis-[30%]'>Name</FormLabel>
-                                <div className='w-full flex flex-col items-start gap-4 sm:basis-[70%]'>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            className='flex flex-row items-center text-xs pl-2 bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4]'
-                                        />
-                                    </FormControl>
-                                    <div className='mt-[-10px] text-xs'>
-                                        <FormMessage />
-                                    </div>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-
-                    {/* Buttons */}
-                    <Buttons setIsViewOpened={setIsViewOpened} clubs={clubs} updateClub={updateClub} setUpdateClub={setUpdateClub} onSubmit={onSubmit} form={form}/>
-
-                    
-                </form>
-            </Form>
-        </div>
-    );
-};
-
-
-
-
-
-// Export
-export default FormCom;
+        </form>
+      </Form>
+    </div>
+  );
+}

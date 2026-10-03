@@ -1,141 +1,109 @@
+// components/modules/payroll/globalMasters/document/documentType/PrismaFormCom.tsx
 'use client';
-// Imports
-import * as z from 'zod';
-import Buttons from './Buttons';
-import {deepEqual} from '@/lib/utils';
-import {useForm} from 'react-hook-form';
-import {Input} from '@/components/ui/input';
-import {useToast} from '@/components/ui/use-toast';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {DocumentTypeValidation} from '@/lib/validations/admission/globalMasters/document/documentType.validation';
-import {createDocumentType, deleteDocumentType, modifyDocumentType} from '@/lib/actions/admission/globalMasters/document/documentType.actions';
+import moment from 'moment';
+import { mutate as globalMutate } from 'swr';
+import { usePathname } from 'next/navigation';
+import { Form } from '@/components/ui/form';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import { useToast } from '@/components/ui/use-toast';
 import { StaffDocumentTypeValidation } from '@/lib/validations/payroll/globalMasters/document/staffDocumentType.validation';
-import { createStaffDocumentType, deleteStaffDocumentType, modifyStaffDocumentType } from '@/lib/actions/payroll/globalMasters/document/staffDocumentType.actions';
-import { modifyStaffDocument } from '@/lib/actions/payroll/globalMasters/document/staffDocument.actions';
+import { createStaffDocumentType, deleteStaffDocumentType, modifyStaffDocumentType } from '@/api/payroll/staffDocumentTypes';
+import { useStaffDocumentTypesList } from '@/lib/hooks/useModuleData/sePayrollData';
+import { useCrudForm } from '@/lib/hooks/useCrudForm';
+import { usePermission } from '@/lib/hooks/usePermission';
+import { emptyStaffDocumentType } from '@/lib/emptyRecords/payroll/emptyStaffDocumentType';
+import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
+import CrudButtons from '@/components/shared/crud/CrudButtons';
+import PrintButton from '@/components/shared/crud/PrintButton';
+import { CurrentUser } from '@/lib/auth/session';
+import { getTabPath } from '@/lib/utils';
+
+export default function PrismaFormCom({ user }: { user: CurrentUser | null }) {
+
+  const pathname = usePathname();
+  const tabPath = getTabPath(pathname);
+  const { toast } = useToast();
 
 
+  const { data: documentTypes, mutate: mutateDocumentTypes } = useStaffDocumentTypesList();
 
 
-
-// Main function
-const FormCom = ({setIsViewOpened, documentTypes, updateDocumentType, setUpdateDocumentType}:any) => {
+  const permissions = usePermission(user);
 
 
-    // Toast
-    const {toast} = useToast();
-
-
-    // Comparison object
-    const comparisonObject = {
-        document_type:updateDocumentType.document_type
-    };
-
-
-    // Form
-    const form = useForm({
-        resolver:zodResolver(StaffDocumentTypeValidation),
-        defaultValues:{
-            document_type:updateDocumentType.id === '' ? '' : updateDocumentType.document_type
+  const { form, mode, isLoading, save, remove, cancel } = useCrudForm({
+    emptyRecord: emptyStaffDocumentType,
+    updateSchema: StaffDocumentTypeValidation,
+    actions: {
+      create: async (values) => {
+        if (documentTypes.some((item) => item.document_type === values.document_type)) {
+          throw new Error('Document type already exists');
         }
-    });
+        await createStaffDocumentType(values);
+        toast({ title: 'Added Successfully!' });
+      },
+      modify: async (values) => {
+        await modifyStaffDocumentType(values);
+        toast({ title: 'Updated Successfully!' });
+      },
+      remove: async (id) => {
+        await deleteStaffDocumentType({ id });
+        toast({ title: 'Deleted Successfully!' });
+      },
+    },
+    onDone: () => {
+      mutateDocumentTypes();
+      globalMutate('staff-document-types-options');
+    },
+    onError: (error) => {
+      toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
+    },
+  });
 
 
-    // Submit handler
-    const onSubmit = async (values:z.infer<typeof StaffDocumentTypeValidation>) => {
-        // Create document type
-        if(updateDocumentType.id === ''){
-            if(documentTypes.map((t:any) => t.document_type).includes(values.document_type)){
-                toast({title:'Document type already exists', variant:'error'});
-                return;
-            };
-            const res = await createStaffDocumentType({
-                document_type:values.document_type
-            });
-            if(res === 0){
-                toast({title:'Please create a session first', variant:'alert'});
-                return;
-            };
-            toast({title:'Added Successfully!'});
-        }
-        // Modify document type
-        else if(!deepEqual(comparisonObject, values)){
-            if(comparisonObject.document_type !== values.document_type && documentTypes.map((d:any) => d.document_type).includes(values.document_type)){
-                toast({title:'Document type already exists', variant:'error'});
-                return;
-            };
-            await modifyStaffDocumentType({
-                id:updateDocumentType.id,
-                document_type:values.document_type
-            });
-            toast({title:'Updated Successfully!'});
-        }
-        // Delete document type
-        else if(updateDocumentType.isDeleteClicked){
-            await deleteStaffDocumentType({id:updateDocumentType.id});
-            toast({title:'Deleted Successfully!'});
-        };
+  const fields: FieldConfig[] = [
+    { type: 'text', name: 'document_type', label: 'Document Type' },
+  ];
 
+  return (
+    <div className='w-full max-w-xl mx-auto mb-10 rounded-[8px] border border-[#E8E8E8] bg-white overflow-hidden'>
+      <h2 className='w-full py-3 text-sm text-center font-bold rounded-t-lg bg-[#e7f0f7] text-main-color border-b border-[#F0F0F0]'>
+        Define Staff Document Type
+      </h2>
+      <Form {...form}>
+        <form onSubmit={save} className='flex flex-col gap-6 p-5 sm:p-8'>
 
-        // Reseting update entity
-        setUpdateDocumentType({
-            id:'',
-            isDeleteClicked:false,
-            document_type:''
-        });
-        // Reseting form
-        form.reset({
-            document_type:''
-        });
-    };
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5'>
+            {fields.map((field) => <DynamicField key={field.name} field={field} control={form.control} />)}
+          </div>
 
+          <div className='flex justify-center pt-5 border-t border-[#F0F0F0]'>
+            {isLoading ? <LoadingIcon /> : (
+              <CrudButtons
+                mode={mode}
+                permissions={permissions}
+                viewHref={`${tabPath}/view`}
+                onSave={save}
+                onDelete={remove}
+                onCancel={cancel}
+                printSlot={
+                  <PrintButton
+                    data={documentTypes}
+                    title='Staff Document Types List'
+                    filename='Staff Document Types List'
+                    sheetName='Staff Document Types'
+                    columns={[
+                      { title: 'Document Type', width: 120, value: (item: any) => item?.document_type },
+                      { title: 'Modified Date', width: 100, value: (item: any) => moment(item?.updated_at).format('D-MMM-yy') },
+                    ]}
+                  />
+                }
+              />
+            )}
+          </div>
 
-    return (
-
-            <Form
-                {...form}
-            >
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className='relative w-full flex flex-col pt-4 items-center px-2 sm:px-4'
-                >
-
-
-                    {/* Document Type */}
-                    <FormField
-                        control={form.control}
-                        name='document_type'
-                        render={({field}) => (
-                            <FormItem className='w-full h-10 flex flex-col items-start justify-center mt-2 sm:flex-row sm:items-center'>
-                                <FormLabel className='basis-auto pr-2 text-end text-xs text-[#726E71] sm:basis-[30%]'>Document type</FormLabel>
-                                <div className='w-full flex flex-col items-start gap-4 sm:basis-[70%]'>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            className='flex flex-row items-center text-xs pl-2 bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4]'
-                                        />
-                                    </FormControl>
-                                    <div className='mt-[-20px] text-xs'>
-                                        <FormMessage />
-                                    </div>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-
-                    {/* Buttons */}
-                    <Buttons setIsViewOpened={setIsViewOpened} documentTypes={documentTypes} updateDocumentType={updateDocumentType} setUpdateDocumentType={setUpdateDocumentType} onSubmit={onSubmit} form={form}/>
-
-                    
-                </form>
-            </Form>
-    );
-};
-
-
-
-
-
-// Export
-export default FormCom;
+        </form>
+      </Form>
+    </div>
+  );
+}

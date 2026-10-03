@@ -1,138 +1,109 @@
+// components/modules/fees/transport/vehicleType/FormCom.tsx
 'use client';
-// Imports
-import * as z from 'zod';
-import Buttons from './Buttons';
-import {deepEqual} from '@/lib/utils';
-import {useForm} from 'react-hook-form';
-import {Input} from '@/components/ui/input';
-import {useToast} from '@/components/ui/use-toast';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {VehicleTypeValidation} from '@/lib/validations/fees/transport/vehicelType.validation';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {createVehicleType, deleteVehicleType, modifyVehicleType} from '@/lib/actions/fees/transport/vehicleType.actions';
+import moment from 'moment';
+import { mutate as globalMutate } from 'swr';
+import { usePathname } from 'next/navigation';
+import { Form } from '@/components/ui/form';
+import LoadingIcon from '@/components/shared/LoadingIcon';
+import { useToast } from '@/components/ui/use-toast';
+import { VehicleTypeValidation } from '@/lib/validations/fees/transport/vehicelType.validation';
+import { createVehicleType, deleteVehicleType, modifyVehicleType } from '@/api/fees/vehicleTypes';
+import { useVehicleTypesList } from '@/lib/hooks/useModuleData/useFeesData';
+import { useCrudForm } from '@/lib/hooks/useCrudForm';
+import { usePermission } from '@/lib/hooks/usePermission';
+import { emptyVehicleType } from '@/lib/emptyRecords/fees/emptyVehicleType';
+import DynamicField, { FieldConfig } from '@/components/shared/crud/DynamicFields';
+import CrudButtons from '@/components/shared/crud/CrudButtons';
+import PrintButton from '@/components/shared/crud/PrintButton';
+import { CurrentUser } from '@/lib/auth/session';
+import { getTabPath } from '@/lib/utils';
+
+export default function FormCom({ user }: { user: CurrentUser | null }) {
+
+  const pathname = usePathname();
+  const tabPath = getTabPath(pathname);
+  const { toast } = useToast();
 
 
+  const { data: vehicleTypes, mutate: mutateVehicleTypes } = useVehicleTypesList();
 
 
-
-// Main function
-const FormCom = ({setIsViewOpened, vehicleTypes, updateVehicleType, setUpdateVehicleType}:any) => {
+  const permissions = usePermission(user);
 
 
-    // Toast
-    const {toast} = useToast();
-
-
-    // Comparison object
-    const comparisonObject = {
-        vehicle_name:updateVehicleType.vehicle_name
-    };
-    
-    
-    // Form
-    const form = useForm({
-        resolver:zodResolver(VehicleTypeValidation),
-        defaultValues:{
-            vehicle_name:updateVehicleType.id === '' ? '' : updateVehicleType.vehicle_name
+  const { form, mode, isLoading, save, remove, cancel } = useCrudForm({
+    emptyRecord: emptyVehicleType,
+    updateSchema: VehicleTypeValidation,
+    actions: {
+      create: async (values) => {
+        if (vehicleTypes.some((item) => item.vehicle_name === values.vehicle_name)) {
+          throw new Error('Vehicle type already exists');
         }
-    });
+        await createVehicleType(values);
+        toast({ title: 'Added Successfully!' });
+      },
+      modify: async (values) => {
+        await modifyVehicleType(values);
+        toast({ title: 'Updated Successfully!' });
+      },
+      remove: async (id) => {
+        await deleteVehicleType({ id });
+        toast({ title: 'Deleted Successfully!' });
+      },
+    },
+    onDone: () => {
+      mutateVehicleTypes();
+      globalMutate('vehicle-types-options');
+    },
+    onError: (error) => {
+      toast({ title: error instanceof Error ? error.message : 'Something went wrong', variant: 'error' });
+    },
+  });
 
 
-    // Submit handler
-    const onSubmit = async (values:z.infer<typeof VehicleTypeValidation>) => {
-        // Create vehicle type
-        if(updateVehicleType.id === ''){
-            if(vehicleTypes.map((vehicleType:any) => vehicleType.vehicle_name).includes(values.vehicle_name)){
-                toast({title:'Vehicle type already exists', variant:'error'});
-                return;
-            };
-            const res = await createVehicleType({
-                vehicle_name:values.vehicle_name
-            });
-            if(res === 0){
-                toast({title:'Please create a session first', variant:'alert'});
-                return;
-            };
-            toast({title:'Added Successfully!'});
-        }
-        // Modify vehicle type
-        else if(!deepEqual(comparisonObject, values)){
-            if(comparisonObject.vehicle_name !== values.vehicle_name && vehicleTypes.map((vehicleType:any) => vehicleType.vehicle_name).includes(values.vehicle_name)) {
-                toast({title:'Vehicle type already exists', variant:'error'});
-                return;
-            };
-            await modifyVehicleType({
-                id:updateVehicleType.id,
-                vehicle_name:values.vehicle_name
-            });
-            toast({title:'Updated Successfully!'});
-        }
-        // Delete vehicle type
-        else if(updateVehicleType.isDeleteClicked){
-            await deleteVehicleType({id:updateVehicleType.id});
-            toast({title:'Deleted Successfully!'});
-        };
+  const fields: FieldConfig[] = [
+    { type: 'text', name: 'vehicle_name', label: 'Vehicle Name' },
+  ];
 
+  return (
+    <div className='w-full max-w-xl mx-auto mb-10 rounded-[8px] border border-[#E8E8E8] bg-white overflow-hidden'>
+      <h2 className='w-full py-3 text-sm text-center font-bold rounded-t-lg bg-[#e7f0f7] text-main-color border-b border-[#F0F0F0]'>
+        Define Vehicle Type
+      </h2>
+      <Form {...form}>
+        <form onSubmit={save} className='flex flex-col gap-6 p-5 sm:p-8'>
 
-        // Reseting update entity
-        setUpdateVehicleType({
-            id:'',
-            isDeleteClicked:false,
-            vehicle_name:'',
-        });
-        // Reseting form
-        form.reset({
-            vehicle_name:''
-        });
-    };
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5'>
+            {fields.map((field) => <DynamicField key={field.name} field={field} control={form.control} />)}
+          </div>
 
+          <div className='flex justify-center pt-5 border-t border-[#F0F0F0]'>
+            {isLoading ? <LoadingIcon /> : (
+              <CrudButtons
+                mode={mode}
+                permissions={permissions}
+                viewHref={`${tabPath}/view`}
+                onSave={save}
+                onDelete={remove}
+                onCancel={cancel}
+                printSlot={
+                  <PrintButton
+                    data={vehicleTypes}
+                    title='Vehicle Types List'
+                    filename='Vehicle Types List'
+                    sheetName='Vehicle Types'
+                    columns={[
+                      { title: 'Vehicle Name', width: 120, value: (item: any) => item?.vehicle_name },
+                      { title: 'Modified Date', width: 100, value: (item: any) => moment(item?.updated_at).format('D-MMM-yy') },
+                    ]}
+                  />
+                }
+              />
+            )}
+          </div>
 
-    return (
-        <div className='w-[90%] max-w-[500px] flex flex-col items-center rounded-[8px] border-[0.5px] border-[#E8E8E8] sm:w-[80%]'>
-            <h2 className='w-full text-center py-2 text-sm rounded-t-[8px] font-bold bg-[#e7f0f7] text-main-color'>Define Vehicle Type</h2>
-            <Form
-                {...form}
-            >
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className='w-full flex flex-col items-center gap-2 px-2 sm:px-4'
-                >
-
-
-                    {/* Vehicle Name */}
-                    <FormField
-                        control={form.control}
-                        name='vehicle_name'
-                        render={({field}) => (
-                            <FormItem className='w-full h-8 mt-6 flex flex-col items-start justify-center sm:flex-row sm:items-center sm:gap-2'>
-                                <FormLabel className='basis-auto text-center text-xs text-[#726E71] sm:basis-[30%]'>Vehicle Name</FormLabel>
-                                <div className='w-full h-full flex flex-col items-start gap-4 sm:basis-[70%]'>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            className='flex flex-row items-center h-full text-xs pl-2 bg-[#FAFAFA] border-[0.5px] border-[#E4E4E4] resize-none'
-                                        />
-                                    </FormControl>
-                                    <FormMessage className='text-xs mt-[-20px]'/>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-
-                    {/* Buttons */}
-                    <div className='sm:px-10'>
-                        <Buttons setIsViewOpened={setIsViewOpened} vehicleTypes={vehicleTypes} updateVehicleType={updateVehicleType} setUpdateVehicleType={setUpdateVehicleType} onSubmit={onSubmit} form={form}/>
-                    </div>
-                </form>
-            </Form>
-        </div>
-    );
-};
-
-
-
-
-
-// Export
-export default FormCom;
+        </form>
+      </Form>
+    </div>
+  );
+}
